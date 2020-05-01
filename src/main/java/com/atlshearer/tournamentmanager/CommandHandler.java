@@ -10,6 +10,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -30,6 +31,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		
 		// Load commands
 		addCommand(new Join());
+		addCommand(new ListTeams());
 		
 		// Add help command to tabCompletion
 		tabCompletionList.add("help");
@@ -82,6 +84,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 			
 			try {
 				sender.sendMessage("Handle command [" + subCommand + "] " + Arrays.toString(args));
+				if (sender instanceof Player) {
+					commands.get(subCommand).onCommand((Player) sender, args);					
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
