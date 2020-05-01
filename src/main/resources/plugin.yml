@@ -1,0 +1,11 @@
+main: com.atlshearer.tournamentmanager.TournamentManager
+name: TournamentManager
+version: 1.0.0
+api-version: 1.15
+author: atlshearer
+description: An Example plugin
+commands:
+    tournamentmanager:
+        description: Tournament Manager Command
+        usage: /tm <command> <args>
+        aliases: [tm]
