@@ -2,6 +2,7 @@ package com.atlshearer.tournamentmanager;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.atlshearer.tournamentmanager.listeners.LogoutEvent;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 
 public class TournamentManager extends JavaPlugin {
@@ -18,6 +19,7 @@ public class TournamentManager extends JavaPlugin {
 		getCommand("tournamentmanager").setExecutor(commandHandler);
 		getCommand("tournamentmanager").setTabCompleter(commandHandler);
 		
+		getServer().getPluginManager().registerEvents(new LogoutEvent(this), this);
 		
 		tournament = new Tournament(this, 8);
 	}
