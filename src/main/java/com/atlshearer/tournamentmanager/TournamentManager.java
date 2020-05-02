@@ -13,6 +13,9 @@ public class TournamentManager extends JavaPlugin {
 	public void onEnable() {
 		getLogger().info("Test log to console!");
 		
+		this.saveDefaultConfig();
+		
+		this.getLogger().info("jdbc:mysql://" + this.getConfig().getString("data.address"));
 		
 		commandHandler = new CommandHandler(this);
 		

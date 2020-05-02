@@ -1,0 +1,14 @@
+data:
+  # Specify as "host:port"
+  address: localhost
+
+  # The name of the database to store tournament data
+  # - This must be created already.
+  database: minecraft
+
+  # Credentials for the database.
+  username: root
+  password: ''
+
+  # The prefix for all TournamentManager SQL tables.
+  table_prefix: 'tournament_'
