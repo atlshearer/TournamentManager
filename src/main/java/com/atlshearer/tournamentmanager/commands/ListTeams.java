@@ -1,5 +1,6 @@
 package com.atlshearer.tournamentmanager.commands;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.atlshearer.tournamentmanager.TournamentManager;
@@ -14,9 +15,7 @@ public class ListTeams implements SubCommand {
 	}
 	
 	public boolean onCommand(Player player, String[] args) {
-		// Handle command
-    	player.sendMessage("You executed the listteams command");
-    	
+    	player.sendMessage(ChatColor.BLUE + "Teams" + ChatColor.RESET);
     	for (Team team : plugin.tournament.getTeams()) {
     		player.sendMessage(team.getTeamName());
     	}

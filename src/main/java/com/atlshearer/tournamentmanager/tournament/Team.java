@@ -7,13 +7,12 @@ import org.bukkit.entity.Player;
 public class Team {
 	private ArrayList<Player> players;
 	
-	private static int totalTeams = 0;
 	public final int teamNumber;
 	
 	public Team(int teamNumber) {
 		this.players = new ArrayList<Player>();
 		
-		this.teamNumber = ++totalTeams;
+		this.teamNumber = teamNumber;
 	}
 	
 	public String getTeamName() {
@@ -27,8 +26,11 @@ public class Team {
 		}
 	}
 	
+	public void removePlayer(Player player) {
+		players.remove(player);
+	}
+	
 	public ArrayList<Player> getPlayers() {
 		return players;
 	}
-	
 }

@@ -6,14 +6,15 @@ import org.bukkit.entity.Player;
 import com.atlshearer.tournamentmanager.TournamentManager;
 import com.atlshearer.tournamentmanager.tournament.Team;
 
-public class Join implements SubCommand {
+public class TeamInfo implements SubCommand {
 
 	private TournamentManager plugin;
 	
-	public Join(TournamentManager plugin) {
+	public TeamInfo(TournamentManager plugin) {
 		this.plugin = plugin;
 	}
 	
+	@Override
 	public boolean onCommand(Player player, String[] args) {
     	// Handle command
     	if (args.length != 1) {
@@ -30,32 +31,34 @@ public class Join implements SubCommand {
     		return true;
     	}
     	
-    	if (plugin.tournament.getTeamFromPlayer(player) != null) {
-    		player.sendMessage(ChatColor.RED + "You are already on a team.");
-    		player.sendMessage(ChatColor.RED + "You must leave that team before joining a new team.");
-    		player.sendMessage(ChatColor.BLUE + "/tm leave");
-    		
-    		return true;
+    	Team team = plugin.tournament.getTeam(Integer.parseInt(args[0]));
+    	
+    	StringBuilder membersString = new StringBuilder("Players: ");
+    	
+    	for (Player teamPlayer : team.getPlayers()) {
+    		membersString.append(teamPlayer.getDisplayName());
+    		membersString.append(' ');
     	}
     	
-    	Team team = plugin.tournament.getTeam(Integer.parseInt(args[0]));
-    	team.addPlayer(player);
-    	
-    	
-    	player.sendMessage("Joining team '" + team.getTeamName() + "'");   	
-    	return true;
-    }
-
-    public String help() {
-    	return "Help message for join command";
-    }
-    
-    public String permission() {
-    	return "tournamentmanager.join";
-    }
-
-	public String name() {
-		return "join";
+    	player.sendMessage("Team name: " + team.getTeamName());   	
+    	player.sendMessage(membersString.toString());
+    	return true;		
 	}
-	
+
+	@Override
+	public String help() {
+		// TODO Auto-generated method stub
+		return "Help message for teaminfo command";
+	}
+
+	@Override
+	public String permission() {
+		return "tournamentmanager.teaminfo";
+	}
+
+	@Override
+	public String name() {
+		return "teaminfo";
+	}
+
 }

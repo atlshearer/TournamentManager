@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,8 +30,11 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		commands = new HashMap < String, SubCommand > ();
 		
 		// Load commands
-		addCommand(new Join());
+		addCommand(new Join(this.plugin));
 		addCommand(new ListTeams(this.plugin));
+		addCommand(new Test());
+		addCommand(new TeamInfo(this.plugin));
+		addCommand(new Leave(this.plugin));
 		
 		// Add help command to tabCompletion
 		tabCompletionList.add("help");
@@ -77,12 +81,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 			
 			if (!commands.containsKey(subCommand)) {
 				sender.sendMessage("Command doesn't exist.");
-				sender.sendMessage("Type /sg help for command information");
+				sender.sendMessage("Type /tm help for command information");
 				return true;
 			}
 			
 			try {
-				sender.sendMessage("Handle command [" + subCommand + "] " + Arrays.toString(args));
+				sender.sendMessage(ChatColor.GRAY + "Handle command [" + subCommand + "] " + Arrays.toString(args));
 				if (sender instanceof Player) {
 					commands.get(subCommand).onCommand((Player) sender, args);					
 				}
