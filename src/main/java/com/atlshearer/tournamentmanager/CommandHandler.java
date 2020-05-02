@@ -11,7 +11,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import com.atlshearer.tournamentmanager.commands.*;
@@ -20,18 +19,18 @@ import com.atlshearer.tournamentmanager.commands.*;
 public class CommandHandler implements CommandExecutor, TabCompleter {
 	private static CommandHandler instance;
 	
-	private Plugin plugin;
+	private TournamentManager plugin;
 	private HashMap < String, SubCommand > commands;
 	public List<String> tabCompletionList = new ArrayList<String>();
 	
-	public CommandHandler(Plugin plugin) {
+	public CommandHandler(TournamentManager plugin) {
 		CommandHandler.instance = this;
 		this.plugin = plugin;
 		commands = new HashMap < String, SubCommand > ();
 		
 		// Load commands
 		addCommand(new Join());
-		addCommand(new ListTeams());
+		addCommand(new ListTeams(this.plugin));
 		
 		// Add help command to tabCompletion
 		tabCompletionList.add("help");
