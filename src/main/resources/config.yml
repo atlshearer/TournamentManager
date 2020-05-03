@@ -1,6 +1,7 @@
 data:
   # Specify as "host:port"
   address: localhost
+  port: 3306
 
   # The name of the database to store tournament data
   # - This must be created already.
