@@ -45,8 +45,8 @@ public class TournamentManager extends JavaPlugin {
 							"player_uuid VARCHAR(36) NOT NULL REFERENCES player(uuid)," +
 							"team_id INT NOT NULL REFERENCES team(id)," +
 							"CONSTRAINT team_member_pkey PRIMARY KEY (player_uuid, team_id)," +
-							"FOREIGN KEY(player_uuid) REFERENCES player(uuid)," +
-							"FOREIGN KEY(team_id)     REFERENCES team(id));");
+							"FOREIGN KEY(player_uuid) REFERENCES " + prefix + "player(uuid)," +
+							"FOREIGN KEY(team_id)     REFERENCES " + prefix + "team(id));");
 			
 			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament (" + 
 							"id INT NOT NULL AUTO_INCREMENT," + 
@@ -58,13 +58,15 @@ public class TournamentManager extends JavaPlugin {
 							"player_uuid VARCHAR(36) NOT NULL," + 
 							"score INT NOT NULL," + 
 							"CONSTRAINT score_pkey PRIMARY KEY (player_uuid, tournament_id)," + 
-							"FOREIGN KEY(player_uuid) REFERENCES player(uuid)," + 
-							"FOREIGN KEY(tournament_id) REFERENCES tournament(id));");
+							"FOREIGN KEY(player_uuid)   REFERENCES " + prefix + "player(uuid)," + 
+							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id));");
 			
 			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament_team (" + 
 							"tournament_id INT NOT NULL," + 
 							"team_id INT NOT NULL," + 
-							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id));");
+							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id)," +
+							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id)," +
+							"FOREIGN KEY(team_id)       REFERENCES " + prefix + "team(id));");
 			
 		} catch (SQLException e) {
 			this.getLogger().warning("Was not able to access database. See stack trace.");
@@ -90,5 +92,10 @@ public class TournamentManager extends JavaPlugin {
 			this.getLogger().warning("An error occured while trying to close the database connection.");
 			e.printStackTrace();
 		}
+	}
+	
+	public void createTournament(String name) {
+		this.getLogger().warning("Create tournament not impl.");
+		this.getLogger().warning("Name req: " + name);
 	}
 }
