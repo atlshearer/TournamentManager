@@ -30,29 +30,30 @@ public class TournamentManager extends JavaPlugin {
 				"useSSL=false");
 		
 		try {
-			database.update("CREATE TABLE IF NOT EXISTS player ("+
+			String prefix = this.getConfig().getString("data.table_prefix");
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "player ("+
 							"uuid VARCHAR(36) NOT NULL," + 
 							"username VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (uuid));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS team (" +
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "team (" +
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS team_member (" +
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "team_member (" +
 							"player_uuid VARCHAR(36) NOT NULL REFERENCES player(uuid)," +
 							"team_id INT NOT NULL REFERENCES team(id)," +
 							"CONSTRAINT team_member_pkey PRIMARY KEY (player_uuid, team_id)," +
 							"FOREIGN KEY(player_uuid) REFERENCES player(uuid)," +
 							"FOREIGN KEY(team_id)     REFERENCES team(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS tournament (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament (" + 
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS score (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "score (" + 
 							"tournament_id INT NOT NULL," + 
 							"player_uuid VARCHAR(36) NOT NULL," + 
 							"score INT NOT NULL," + 
@@ -60,7 +61,7 @@ public class TournamentManager extends JavaPlugin {
 							"FOREIGN KEY(player_uuid) REFERENCES player(uuid)," + 
 							"FOREIGN KEY(tournament_id) REFERENCES tournament(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS tournament_team (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament_team (" + 
 							"tournament_id INT NOT NULL," + 
 							"team_id INT NOT NULL," + 
 							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id));");

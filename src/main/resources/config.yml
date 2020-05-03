@@ -12,4 +12,4 @@ data:
   password: ''
 
   # The prefix for all TournamentManager SQL tables.
-  table_prefix: 'tournament_'
+  table_prefix: 'tm_'
