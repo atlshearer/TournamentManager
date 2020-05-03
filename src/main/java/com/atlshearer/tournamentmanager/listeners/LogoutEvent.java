@@ -20,10 +20,10 @@ public class LogoutEvent implements Listener {
     public void onPlayerLogout(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        Team team = plugin.tournament.getTeamFromPlayer(player);
+        /*Team team = plugin.tournament.getTeamFromPlayer(player);
         if (team != null) {
         	team.removePlayer(player);
-        }
+        }*/
     }
 	
 }

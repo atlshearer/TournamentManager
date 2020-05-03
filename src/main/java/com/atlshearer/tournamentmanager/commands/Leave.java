@@ -14,7 +14,7 @@ public class Leave implements SubCommand {
 	}
 	
 	public boolean onCommand(Player player, String[] args) {
-    	// Handle command
+    	/*// Handle command
     	if (args.length != 0) {
     		player.sendMessage(ChatColor.RED + "Incorrect usage.");
     		player.sendMessage(help());
@@ -32,7 +32,7 @@ public class Leave implements SubCommand {
     	team.removePlayer(player);    	
     	
     	
-    	player.sendMessage("Leaving team '" + team.getTeamName() + "'");   	
+    	player.sendMessage("Leaving team '" + team.getTeamName() + "'");*/
     	return true;
     }
 

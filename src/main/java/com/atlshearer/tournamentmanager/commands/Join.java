@@ -15,7 +15,7 @@ public class Join implements SubCommand {
 	}
 	
 	public boolean onCommand(Player player, String[] args) {
-    	// Handle command
+    	/*// Handle command
     	if (args.length != 1) {
     		player.sendMessage(ChatColor.RED + "Incorrect usage.");
     		player.sendMessage(help());
@@ -42,7 +42,7 @@ public class Join implements SubCommand {
     	team.addPlayer(player);
     	
     	
-    	player.sendMessage("Joining team '" + team.getTeamName() + "'");   	
+    	player.sendMessage("Joining team '" + team.getTeamName() + "'");   	*/
     	return true;
     }
 
