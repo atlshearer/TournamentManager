@@ -7,14 +7,14 @@ import org.bukkit.entity.Player;
 
 import com.atlshearer.tournamentmanager.TournamentManager;
 
-public class CreateTournament implements SubCommand {
+public class CreateTeam implements SubCommand {
 
 	private TournamentManager plugin;
 	
-	public CreateTournament(TournamentManager plugin) {
+	public CreateTeam(TournamentManager plugin) {
 		this.plugin = plugin;
 	}
-
+	
 	@Override
 	public boolean onCommand(Player player, String[] args) {
 		if (args.length < 1) {
@@ -35,30 +35,28 @@ public class CreateTournament implements SubCommand {
 			String prefix = this.plugin.getConfig().getString("data.table_prefix");
 			
 			this.plugin.database.update(
-					"INSERT INTO " + prefix + "tournament (name) VALUES ('" + name + "')");
+					"INSERT INTO " + prefix + "team (name) VALUES ('" + name + "')");
 		} catch (SQLException e) {
 			player.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
 		
-		return true;
+		return false;
 	}
 
 	@Override
 	public String help() {
-		return "Help message for createtournament command";
+		return "Help message for createteam command";
 	}
 
 	@Override
 	public String permission() {
-		return "tournamentmanager.tournament.create";
+		return "tournamentmanager.team.create";
 	}
 
 	@Override
 	public String name() {
-		return "createtournament";
+		return "createteam";
 	}
-	
-	
-	
+
 }

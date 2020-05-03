@@ -23,8 +23,10 @@ public class ListTournaments implements SubCommand {
     		return true;
 		}
 		
+		String prefix = this.plugin.getConfig().getString("data.table_prefix");
+		
 		try {
-			this.plugin.database.query("SELECT * FROM `tm_tournament`;", results -> {
+			this.plugin.database.query("SELECT * FROM `" + prefix + "tournament`;", results -> {
 				if (results != null) {
 					while(results.next()) {
 						int id = results.getInt("id");

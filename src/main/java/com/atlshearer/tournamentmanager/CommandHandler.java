@@ -37,6 +37,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		addCommand(new Leave(this.plugin));
 		addCommand(new CreateTournament(this.plugin));
 		addCommand(new ListTournaments(this.plugin));
+		addCommand(new CreateTeam(this.plugin));
+		addCommand(new TournamentAddTeam(this.plugin));
 		
 		// Add help command to tabCompletion
 		tabCompletionList.add("help");
