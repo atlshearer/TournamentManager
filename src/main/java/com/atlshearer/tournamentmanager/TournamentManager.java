@@ -11,8 +11,9 @@ import pro.husk.mysql.MySQL;
 
 public class TournamentManager extends JavaPlugin {
 	public CommandHandler commandHandler;
-	public Tournament tournament;
 	public MySQL database;
+	
+	private Tournament tournament;
 	
 	@Override
 	public void onEnable() {		
@@ -47,8 +48,17 @@ public class TournamentManager extends JavaPlugin {
 		}
 	}
 	
+	public boolean isTournamentEnabled() {
+		return this.tournament != null;
+	}
+	
 	public Tournament getCurrentTournament() {
 		return this.tournament;
+	}
+	
+	public void setCurrentTournament(Tournament tournament) {
+		this.tournament = tournament;
+		this.getLogger().info("Tournament now set to " + tournament.name);
 	}
 	
 	public void createTournament(String name) {

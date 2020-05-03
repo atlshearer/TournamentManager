@@ -1,9 +1,11 @@
 package com.atlshearer.tournamentmanager;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.atlshearer.tournamentmanager.tournament.Team;
+import com.atlshearer.tournamentmanager.tournament.Tournament;
 
 import pro.husk.mysql.MySQL;
 
@@ -122,5 +124,48 @@ public class DatabaseUtils {
 		});
 		
 		return teams;
+	}
+	
+	public static Team getTeamByID(int teamID) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
+				"WHERE %1$steam.id = %2$d", 
+				prefix,
+				teamID);
+		
+		Team team = null;
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		if (results != null) {
+			team = new Team(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.close();
+		
+		return team;
+	}
+	
+	public static Tournament getTournamentByID(int tournamentID) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament " +
+				"WHERE %1$stournament.id = %2$d", 
+				prefix,
+				tournamentID);
+		
+		Tournament tournament = null;
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		
+		if (results.next()) {
+			tournament = new Tournament(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.getStatement().close();
+		
+		return tournament;
 	}
 }
