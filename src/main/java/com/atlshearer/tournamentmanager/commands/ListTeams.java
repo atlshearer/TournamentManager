@@ -35,7 +35,7 @@ public class ListTeams implements SubCommand {
 		
 		try {
 	    	if (args.length == 0) {
-	    		// TODO process request for current tournament
+	    		teams = DatabaseUtils.getTeamsInTournament(this.plugin.getCurrentTournament().id);
 	    	} else if (args[0].compareToIgnoreCase("all") == 0) {
 	    		teams = DatabaseUtils.getTeams();
 	    	} else {

@@ -1,9 +1,12 @@
 package com.atlshearer.tournamentmanager;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 import com.atlshearer.tournamentmanager.tournament.Team;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 
@@ -62,6 +65,12 @@ public class DatabaseUtils {
 							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id)," +
 							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id)," +
 							"FOREIGN KEY(team_id)       REFERENCES " + prefix + "team(id));");
+			
+			database.update(String.format("CREATE OR REPLACE VIEW %1$steam_score AS " + 
+							"SELECT %1$sscore.tournament_id, %1$steam.id AS team_id, %1$steam.name AS team_name, SUM(%1$sscore.score) AS score FROM %1$sscore " + 
+							"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$sscore.player_uuid " + 
+							"JOIN %1$steam ON %1$steam.id = %1$steam_member.team_id " + 
+							"GROUP BY %1$steam.id, %1$sscore.tournament_id", prefix));
 			
 		} catch (SQLException e) {
 			DatabaseUtils.plugin.getLogger().warning("Was not able to access database. See stack trace.");
@@ -147,6 +156,60 @@ public class DatabaseUtils {
 		return team;
 	}
 	
+	public static ArrayList<Team> getTeamScores(Tournament tournament) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT team_id, team_name, score FROM %1$steam_score " +
+				"WHERE %1$steam_score.tournament_id = %2$d " +
+				"ORDER BY score DESC;", 
+				prefix,
+				tournament.id);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		ArrayList<Team> teams = new ArrayList<Team>();
+		
+		while (results.next()) {
+			teams.add(new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score")));;
+		}
+		
+		return teams; 
+	}
+	
+	public static int getTeamScoreByID(Tournament tournament, int teamID) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT score FROM %1$steam_score " +
+				"WHERE %1$steam_score.tournament_id = %2$d " +
+				"AND %1$steam_score.team_id = %3$d;", 
+				prefix,
+				tournament.id,
+				teamID);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		int score = 0;
+		
+		if (results.next()) {
+			score = results.getInt("score");
+		}
+		
+		return score; 
+	}
+	
+	/**
+	 * Gets the specified tournament
+	 * 
+	 * @param tournamentID
+	 * @return Returns specified tournament if found or null
+	 * @throws SQLException
+	 */
 	public static Tournament getTournamentByID(int tournamentID) throws SQLException {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 		
@@ -167,5 +230,111 @@ public class DatabaseUtils {
 		results.getStatement().close();
 		
 		return tournament;
+	}
+	
+	
+	/**
+	 * Gets the score of the player in the given tournament
+	 * 
+	 * @param tournament
+	 * @param uuid
+	 * @return int - player score or 0
+	 * @throws SQLException
+	 */
+	public static int getPlayerScore(Tournament tournament, String uuid) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$sscore.tournament_id, %1$sscore.player_uuid, %1$sscore.score FROM %1$sscore " +
+				"WHERE %1$sscore.tournament_id = %2$d " +
+				"AND %1$sscore.player_uuid = '%3$s';", 
+				prefix,
+				tournament.id,
+				uuid);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		int score = 0;
+		
+		if (results.next()) {
+			score = results.getInt("score");
+		}
+		
+		return score;
+	}
+	
+	
+	/**
+	 * Sets the score of player for given tournament
+	 * 
+	 * @param tournament
+	 * @param uuid
+	 * @param score
+	 * @throws SQLException
+	 */
+	public static void setPlayerScore(Tournament tournament, String uuid, int score) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$sscore.tournament_id, %1$sscore.player_uuid, %1$sscore.score FROM %1$sscore " +
+				"WHERE %1$sscore.tournament_id = %2$d " +
+				"AND %1$sscore.player_uuid = '%3$s';", 
+				prefix,
+				tournament.id,
+				uuid);
+		
+		Connection connection = database.getConnection();
+		PreparedStatement statment = connection.prepareStatement(
+				requestStr,
+				ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_UPDATABLE);
+		ResultSet results = statment.executeQuery();
+		
+		if (!results.next()) {
+			// No results found
+			results.moveToInsertRow();
+			results.updateInt("tournament_id", tournament.id);
+			results.updateString("player_uuid", uuid);
+			results.updateInt("score", score);
+			results.insertRow();
+			results.moveToCurrentRow();
+		} else {
+			results.updateInt("score", score);
+			results.updateRow();
+		}
+		
+		results.getStatement().close();
+		
+	}
+	
+	/**
+	 * Gets the data stored for a player from database
+	 * 
+	 * @param name
+	 * @return SimplePlayer with data about player or null
+	 * @throws SQLException
+	 */
+	public static SimplePlayer getPlayerByName(String name) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$splayer.uuid, %1$splayer.username FROM %1$splayer " +
+				"WHERE %1$splayer.username = '%2$s';", 
+				prefix,
+				name);
+		
+		SimplePlayer player = null;
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		if (results.next()) {
+			player = new SimplePlayer(results.getString("uuid"), results.getString("username"));
+		}
+		
+		results.getStatement().close();
+		
+		return player;
 	}
 }
