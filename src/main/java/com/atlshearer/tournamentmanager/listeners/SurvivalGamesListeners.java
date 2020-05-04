@@ -47,9 +47,8 @@ public class SurvivalGamesListeners implements Listener {
 				@Override
 				public void run() {
 					try {
-						int oldScore;
-						oldScore = DatabaseUtils.getPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString());
-						DatabaseUtils.setPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString(), oldScore + 10);
+						DatabaseUtils.addToPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString(), 10);
+
 					} catch (SQLException e) {
 						Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
 						e.printStackTrace();
