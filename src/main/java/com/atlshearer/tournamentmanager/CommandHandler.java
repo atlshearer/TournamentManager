@@ -100,7 +100,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 			try {
 				sender.sendMessage(ChatColor.GRAY + "Handle command [" + subCommand + "] " + Arrays.toString(args));
 				if (sender instanceof Player) {
-					commands.get(subCommand).onCommand((Player) sender, args);					
+					SubCommand subCmdObj = commands.get(subCommand);
+					if (sender.hasPermission(subCmdObj.permission())) {
+						commands.get(subCommand).onCommand((Player) sender, args);
+					} else {
+						sender.sendMessage(ChatColor.RED + "You do not have the required permission. " + subCmdObj.permission());
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -116,11 +121,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 			if(args.length == 1) {
 				List<String> list = new ArrayList<String>();	
 				
-				for (String string : tabCompletionList) {
-					if (string.startsWith(args[0].toLowerCase())) {
-						list.add(string);
+				for (SubCommand subCommand : commands.values()) {
+					if (subCommand.name().startsWith(args[0].toLowerCase()) && sender.hasPermission(subCommand.permission())) {
+						list.add(subCommand.name());
 					}
 				}
+				
 				return list;
 				
 			} else if(args.length == 2) {

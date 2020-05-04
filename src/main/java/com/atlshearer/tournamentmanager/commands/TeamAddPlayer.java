@@ -63,7 +63,7 @@ public class TeamAddPlayer implements SubCommand {
 	@Override
 	public String permission() {
 		// TODO Auto-generated method stub
-		return null;
+		return "tournamentmanager.team.player.add";
 	}
 
 	@Override

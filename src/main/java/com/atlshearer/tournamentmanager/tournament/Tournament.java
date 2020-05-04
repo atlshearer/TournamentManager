@@ -1,7 +1,5 @@
 package com.atlshearer.tournamentmanager.tournament;
 
-import org.bukkit.plugin.Plugin;
-
 public class Tournament {
 
 	public final int id;
