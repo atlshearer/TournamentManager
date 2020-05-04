@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.atlshearer.tournamentmanager.listeners.LogoutEvent;
 import com.atlshearer.tournamentmanager.listeners.SurvivalGamesListeners;
+import com.atlshearer.tournamentmanager.listeners.TNTRunListeners;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 
 import pro.husk.mysql.MySQL;
@@ -35,6 +36,7 @@ public class TournamentManager extends JavaPlugin {
 		
 		getServer().getPluginManager().registerEvents(new LogoutEvent(this), this);
 		getServer().getPluginManager().registerEvents(new SurvivalGamesListeners(), this);
+		getServer().getPluginManager().registerEvents(new TNTRunListeners(this), this);
 		
 		// Set tournament to null
 		tournament = null;

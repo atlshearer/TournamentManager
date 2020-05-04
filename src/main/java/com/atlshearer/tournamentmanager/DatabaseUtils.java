@@ -66,11 +66,14 @@ public class DatabaseUtils {
 							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id)," +
 							"FOREIGN KEY(team_id)       REFERENCES " + prefix + "team(id));");
 			
-			database.update(String.format("CREATE OR REPLACE VIEW %1$steam_score AS " + 
-							"SELECT %1$sscore.tournament_id, %1$steam.id AS team_id, %1$steam.name AS team_name, SUM(%1$sscore.score) AS score FROM %1$sscore " + 
-							"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$sscore.player_uuid " + 
-							"JOIN %1$steam ON %1$steam.id = %1$steam_member.team_id " + 
-							"GROUP BY %1$steam.id, %1$sscore.tournament_id", prefix));
+			database.update(String.format(
+					"CREATE OR REPLACE VIEW %1$steam_score AS " + 
+					"SELECT %1$sscore.tournament_id, %1$steam.id AS team_id, %1$steam.name AS team_name, SUM(%1$sscore.score) AS score FROM %1$sscore " + 
+					"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$sscore.player_uuid " + 
+					"JOIN %1$steam ON %1$steam.id = %1$steam_member.team_id " + 
+					"JOIN %1$stournament_team ON %1$stournament_team.team_id = %1$steam.id " + 
+					"WHERE %1$stournament_team.tournament_id = %1$sscore.tournament_id " + 
+					"GROUP BY %1$steam.id, %1$sscore.tournament_id", prefix));
 			
 		} catch (SQLException e) {
 			DatabaseUtils.plugin.getLogger().warning("Was not able to access database. See stack trace.");
@@ -307,6 +310,30 @@ public class DatabaseUtils {
 		
 		results.getStatement().close();
 		
+	}
+	
+	/**
+	 * Adds the given score to the players total
+	 * 
+	 * @param tournament
+	 * @param uuid
+	 * @param score
+	 * @throws SQLException
+	 */
+	public static void addToPlayerScore(Tournament tournament, String uuid, int score) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"UPDATE %1$sscore " + 
+				"SET %1$sscore.score = %1$sscore.score + %4$d " + 
+				"WHERE %1$sscore.tournament_id = %2$d " + 
+				"AND %1$sscore.player_uuid = '%3$s'", 
+				prefix,
+				tournament.id,
+				uuid,
+				score);
+		
+		database.update(requestStr);
 	}
 	
 	/**

@@ -43,16 +43,23 @@ public class SurvivalGamesListeners implements Listener {
 		TournamentManager tournamentManager = (TournamentManager) Bukkit.getPluginManager().getPlugin("TournamentManager");
 		
 		if (tournamentManager.isTournamentEnabled()) {
-			try {
-				int oldScore;
-				oldScore = DatabaseUtils.getPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString());
-				DatabaseUtils.setPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString(), oldScore + 10);
-			} catch (SQLException e) {
-				Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
-				e.printStackTrace();
-			}
+			Bukkit.getScheduler().runTaskAsynchronously(tournamentManager, new Runnable() {
+				@Override
+				public void run() {
+					try {
+						int oldScore;
+						oldScore = DatabaseUtils.getPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString());
+						DatabaseUtils.setPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString(), oldScore + 10);
+					} catch (SQLException e) {
+						Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
+						e.printStackTrace();
+					}					
+				}
+			});
 			
-			Bukkit.broadcastMessage("Giving player " + killer.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD +" 10 Points!");
+			Bukkit.broadcastMessage("Giving player " + killer.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " 10 Points for killing " + p.getDisplayName());
+		} else {
+			Bukkit.broadcast(ChatColor.RED + "No tournament is enable. No scores being given.", "tournamentmanager.admin");
 		}
 		
 	}
