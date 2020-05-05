@@ -6,7 +6,10 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.atlshearer.tournamentmanager.commands.player.ListPlayers;
+import com.atlshearer.tournamentmanager.commands.team.ListTeams;
 import com.atlshearer.tournamentmanager.commands.team.TeamRoot;
+import com.atlshearer.tournamentmanager.commands.tournament.ListTournament;
 import com.atlshearer.tournamentmanager.commands.tournament.TournamentRoot;
 
 public class RootCommand extends Command {
@@ -17,6 +20,10 @@ public class RootCommand extends Command {
 		// Register sub-commands
 		addChild(new TeamRoot(this));
 		addChild(new TournamentRoot(this));
+		
+		addChild(new ListPlayers(this));
+		addChild(new ListTeams(this));
+		addChild(new ListTournament(this));
 	}
 	
 	@Override
