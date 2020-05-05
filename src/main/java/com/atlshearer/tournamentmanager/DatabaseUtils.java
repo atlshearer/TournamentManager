@@ -175,6 +175,13 @@ public class DatabaseUtils {
 		return team;
 	}
 	
+	/**
+	 * Gets the team of the given name from database
+	 * 
+	 * @param teamName
+	 * @return Team if a team was found or null
+	 * @throws SQLException
+	 */
 	public static Team getTeamByName(String teamName) throws SQLException {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 		
@@ -243,6 +250,19 @@ public class DatabaseUtils {
 		return score; 
 	}
 	
+	public static void addPlayerToTeam(SimplePlayer player, Team team) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"INSERT INTO %1$steam_member (player_uuid, team_id) VALUE ('%2$s', %3$s);", 
+				prefix,
+				player.uuid,
+				team.id);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		DatabaseUtils.database.update(requestStr);
+	}
 	
 	// Tournament
 	public static void createTournament(String name) throws SQLException {
@@ -511,5 +531,32 @@ public class DatabaseUtils {
 		results.getStatement().close();
 		
 		return player;
+	}
+	
+	/**
+	 * Gets all players in database
+	 * 
+	 * @param name
+	 * @return SimplePlayer with data about player or null
+	 * @throws SQLException
+	 */
+	public static ArrayList<SimplePlayer> getPlayers() throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$splayer.uuid, %1$splayer.username FROM %1$splayer", 
+				prefix);
+		
+		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		while (results.next()) {
+			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
+		}
+		
+		results.getStatement().close();
+		
+		return players;
 	}
 }
