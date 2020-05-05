@@ -399,6 +399,31 @@ public class DatabaseUtils {
 		// Find all players in team
 	}
 	
+	public static void addTeamToTournament(Tournament tournament, Team team) throws SQLException {
+		addTeamToTournament(tournament.id, team.id);
+	}
+	
+	public static boolean isTeamInTournament(Tournament tournament, Team team) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT * FROM %1$stournament_team " + 
+				"WHERE tournament_id = %2$d " + 
+				"AND team_id = %3$d", 
+				prefix,
+				tournament.id,
+				team.id);
+		
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		
+		Boolean inTournament = results.next();
+				
+		results.getStatement().close();
+		
+		return inTournament;
+	}
+	
 	// Player
 	public static void addPlayer(Player player) throws SQLException {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");

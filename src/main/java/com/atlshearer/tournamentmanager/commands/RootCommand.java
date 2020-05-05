@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.atlshearer.tournamentmanager.commands.player.ListPlayers;
+import com.atlshearer.tournamentmanager.commands.player.PlayerRoot;
 import com.atlshearer.tournamentmanager.commands.team.ListTeams;
 import com.atlshearer.tournamentmanager.commands.team.TeamRoot;
 import com.atlshearer.tournamentmanager.commands.tournament.ListTournament;
@@ -18,6 +19,7 @@ public class RootCommand extends Command {
 		super();
 		
 		// Register sub-commands
+		addChild(new PlayerRoot(this));
 		addChild(new TeamRoot(this));
 		addChild(new TournamentRoot(this));
 		

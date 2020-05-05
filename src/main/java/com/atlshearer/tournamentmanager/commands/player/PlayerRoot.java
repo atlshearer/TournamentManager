@@ -1,4 +1,4 @@
-package com.atlshearer.tournamentmanager.commands.tournament;
+package com.atlshearer.tournamentmanager.commands.player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,16 +11,14 @@ import org.bukkit.command.CommandSender;
 import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.InvalidCommandNameException;
-import com.atlshearer.tournamentmanager.tournament.Tournament;
+import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 
-public class TournamentRoot extends Command {
+public class PlayerRoot extends Command {
 
-	public TournamentRoot(Command parent) {
+	public PlayerRoot(Command parent) {
 		super(parent);
 		
-		addChild(new Create(this));
-		addChild(new Enable(this));
-		addChild(new AddTeam(this));
+		addChild(new Score(this));
 	}
 
 	@Override
@@ -28,10 +26,11 @@ public class TournamentRoot extends Command {
 			List<String> pargs) {
 		
 		if (args == null || args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-			sender.sendMessage(ChatColor.GREEN + "Usage - /tm tournament <tournamen_name> ...");
+			sender.sendMessage(ChatColor.GREEN + getHelp());
 		} else if (args.length == 1) {
-			// Only tournament name is entered
-			sender.sendMessage("Tournament name: " + args[0]);
+			pargs.add(args[0]);
+			
+			//children.get("info").onCommand(sender, command, label, new String[0], pargs);
 		} else {
 			try {				
 				String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
@@ -41,14 +40,15 @@ public class TournamentRoot extends Command {
 			} catch (InvalidCommandNameException e) {
 				sender.sendMessage(ChatColor.RED + args[1] + " is not a valid sub-command of /" + label);
 			}
+
 		}
 	}
-	
+
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
 		ArrayList<String> suggestions = new ArrayList<String>();
-		ArrayList<String> tournamentNames = new ArrayList<String>();
+		ArrayList<String> playerNames = new ArrayList<String>();
 		
 		
 		if (args == null || args.length == 0) {
@@ -57,8 +57,8 @@ public class TournamentRoot extends Command {
 		
 		
 		try {
-			for (Tournament tournament : DatabaseUtils.getTournaments()) {
-				tournamentNames.add(tournament.name);
+			for (SimplePlayer player : DatabaseUtils.getPlayers()) {
+				playerNames.add(player.username);
 			}
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
@@ -66,12 +66,12 @@ public class TournamentRoot extends Command {
 		}
 		
 		
-		if (tournamentNames.contains(args[0])) {
+		if (playerNames.contains(args[0])) {
 			return super.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
 		}		
 		
 		
-		for (String name : tournamentNames) {
+		for (String name : playerNames) {
 			if (name.toLowerCase().startsWith(args[0].toLowerCase())) {
 				suggestions.add(name);
 			}
@@ -82,12 +82,17 @@ public class TournamentRoot extends Command {
 	
 	@Override
 	public String getName() {
-		return "tournament";
+		return "player";
 	}
 
 	@Override
+	public String getHelp() {
+		return "Usage - /tm player <player_name> ...";
+	}
+	
+	@Override
 	protected String getBasePermission() {
-		return "tournament";
+		return "player";
 	}
 
 }
