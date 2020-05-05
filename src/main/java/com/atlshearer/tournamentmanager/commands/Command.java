@@ -34,7 +34,20 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 	// ----- Interface ----- //
 	
 	@Override
-	abstract public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args);
+	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args) {
+		throw new UnsupportedOperationException("This should only be called on the root command. If you see this error please report to developer.");
+	}
+	
+    /**
+     * Executes the given command.
+     * @param sender Source of the command
+     * @param command Command which was executed
+     * @param label Alias of the command which was used
+     * @param args Passed command arguments
+     * @param pargs Persistent arguments that need to be help onto
+     * @return true if a valid command, otherwise false
+     */
+	abstract public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args, List<String> pargs);
 	
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
@@ -72,7 +85,7 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 	// ----- Protected Helpers ----- //
 	
 	protected void passToChild(CommandSender sender, org.bukkit.command.Command command, String label, 
-			String[] args) throws InvalidCommandNameException {
+			String[] args, List<String> pargs) throws InvalidCommandNameException {
 		if (!children.containsKey(args[0])) {
 			throw new InvalidCommandNameException(String.format("%s is not a valid child-command of %s", args[0], getName()));
 		}
@@ -81,7 +94,7 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 		
 		String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
 		String newLabel = label + ' ' + args[0];
-		children.get(args[0]).onCommand(sender, command, newLabel, newArgs);
+		children.get(args[0]).onCommand(sender, command, newLabel, newArgs, pargs);
 	}
 	
 	protected void addChild(Command child) {

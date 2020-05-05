@@ -1,9 +1,13 @@
 package com.atlshearer.tournamentmanager.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.atlshearer.tournamentmanager.commands.team.TeamRoot;
+import com.atlshearer.tournamentmanager.commands.tournament.TournamentRoot;
 
 public class RootCommand extends Command {
 
@@ -12,6 +16,7 @@ public class RootCommand extends Command {
 		
 		// Register sub-commands
 		addChild(new TeamRoot(this));
+		addChild(new TournamentRoot(this));
 	}
 	
 	@Override
@@ -21,16 +26,22 @@ public class RootCommand extends Command {
 			sender.sendMessage("Type /tm help for command information");
 		} else {
 			try {
-				passToChild(sender, command, label, args);
+				passToChild(sender, command, label, args, new ArrayList<String>());
 			} catch (InvalidCommandNameException e) {
 				sender.sendMessage(ChatColor.RED + args[0] + " is not a valid sub-command of /" + label);
-				e.printStackTrace();
 			}
 		}
 		
 		return true;
 	}
 
+	@Override
+	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
+			List<String> pargs) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("If you see this error please report to developer. " + getName());
+	}
+	
 	@Override
 	public String getBasePermission() {
 		return "tournamentmanager";

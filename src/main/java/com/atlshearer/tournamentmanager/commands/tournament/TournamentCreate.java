@@ -1,4 +1,4 @@
-package com.atlshearer.tournamentmanager.commands.team;
+package com.atlshearer.tournamentmanager.commands.tournament;
 
 import java.util.List;
 
@@ -7,19 +7,20 @@ import org.bukkit.command.CommandSender;
 
 import com.atlshearer.tournamentmanager.commands.Command;
 
-public class TeamCreate extends Command {
+public class TournamentCreate extends Command {
 
-	public TeamCreate(Command parent) {
+	public TournamentCreate(Command parent) {
 		super(parent);
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
 		if (args.length != 0) {
-			sender.sendMessage(getHelp());
+			sender.sendMessage(ChatColor.GREEN + "Usage - /tm tournament <tournamen_name> create");
 		} else {
-			sender.sendMessage(ChatColor.RED + args[0] + " is not a valid sub-command of /" + label);
+			sender.sendMessage("Creating tournament with name: " + pargs.get(0));
 		}
 	}
 
