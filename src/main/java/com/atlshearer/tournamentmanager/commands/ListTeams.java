@@ -31,6 +31,13 @@ public class ListTeams implements SubCommand {
     		return true;
     	}
     	
+    	if (args.length == 0) {
+    		if (!this.plugin.isTournamentEnabled()) {
+    			player.sendMessage(ChatColor.RED + "Please enable a tournament.");
+    			return true;
+    		}
+    	}
+    	
     	ArrayList<Team> teams = new ArrayList<Team>();
 		
 		try {

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
 
 public class TournamentAddTeam implements SubCommand {
@@ -29,20 +30,9 @@ public class TournamentAddTeam implements SubCommand {
     		
     		return true;
     	}
-	   	
-    	
+	   	    	
 		try {
-			String prefix = this.plugin.getConfig().getString("data.table_prefix");
-			
-			StringBuilder requestStr = new StringBuilder("INSERT INTO ");
-			requestStr.append(prefix);
-			requestStr.append("tournament_team (team_id, tournament_id) VALUES (");
-			requestStr.append(args[0]);
-			requestStr.append(", ");
-			requestStr.append(args[1]);
-			requestStr.append(");");
-			
-			this.plugin.database.update(requestStr.toString());
+			DatabaseUtils.addTeamToTournament(Integer.parseInt(args[1]), Integer.parseInt(args[0]));
 		} catch (SQLException e) {
 			player.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			player.sendMessage(ChatColor.GRAY + "Make sure ids are correct.");

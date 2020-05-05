@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
 
 public class CreateTeam implements SubCommand {
@@ -32,10 +33,9 @@ public class CreateTeam implements SubCommand {
 		}
 		
 		try {
-			String prefix = this.plugin.getConfig().getString("data.table_prefix");
+			DatabaseUtils.createTeam(name);
 			
-			this.plugin.database.update(
-					"INSERT INTO " + prefix + "team (name) VALUES ('" + name + "')");
+			player.sendMessage(ChatColor.GREEN + name + " added to database successfully.");
 		} catch (SQLException e) {
 			player.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
@@ -46,7 +46,7 @@ public class CreateTeam implements SubCommand {
 
 	@Override
 	public String help() {
-		return "Help message for createteam command";
+		return "Usage - /tm createteam <team name>";
 	}
 
 	@Override

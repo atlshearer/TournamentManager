@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
 
 public class AddPlayer implements SubCommand {
@@ -36,15 +37,9 @@ public class AddPlayer implements SubCommand {
 		}
 		
 		try {
-			String prefix = this.plugin.getConfig().getString("data.table_prefix");
+			DatabaseUtils.addPlayer(target);
 			
-			String requestStr = String.format(
-					"INSERT INTO %1$splayer (uuid, username) VALUE ('%2$s', '%3$s');", 
-					prefix,
-					target.getUniqueId(),
-					target.getName());
-			
-			this.plugin.database.update(requestStr);
+			player.sendMessage(ChatColor.GREEN + target.getName() + " added to database successfully.");
 		} catch (SQLException e) {
 			player.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
@@ -60,7 +55,7 @@ public class AddPlayer implements SubCommand {
 
 	@Override
 	public String permission() {
-		return "tournamentmanager.addplayer";
+		return "tournamentmanager.player.add";
 	}
 
 	@Override

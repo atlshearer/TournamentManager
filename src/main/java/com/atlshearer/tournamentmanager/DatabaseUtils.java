@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.bukkit.entity.Player;
+
 import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 import com.atlshearer.tournamentmanager.tournament.Team;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
@@ -80,6 +82,20 @@ public class DatabaseUtils {
 			e.printStackTrace();
 		}
 	}
+
+	
+	// Team	
+	public static void createTeam(String name) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"INSERT INTO %1$steam (name) VALUE ('%2$s');", 
+				prefix,
+				name);
+		
+		DatabaseUtils.database.update(requestStr);
+	}
+
 	
 	/**
 	 * Gets all teams stored in database
@@ -206,6 +222,19 @@ public class DatabaseUtils {
 		return score; 
 	}
 	
+	
+	// Tournament
+	public static void createTournament(String name) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"INSERT INTO %1$stournament (name) VALUE ('%2$s');", 
+				prefix,
+				name);
+		
+		DatabaseUtils.database.update(requestStr);
+	}
+	
 	/**
 	 * Gets the specified tournament
 	 * 
@@ -235,6 +264,55 @@ public class DatabaseUtils {
 		return tournament;
 	}
 	
+	public static void addTeamToTournament(int tournamentID, int teamID) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"INSERT INTO %1$stournament_team (team_id, tournament_id) VALUE (%2$d, %3$d);", 
+				prefix,
+				teamID,
+				tournamentID);
+		
+		DatabaseUtils.database.update(requestStr);
+		
+		// Find all players in team
+	}
+	
+	// Player
+	public static void addPlayer(Player player) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"INSERT INTO %1$splayer (uuid, username) VALUE ('%2$s', '%3$s');", 
+				prefix,
+				player.getUniqueId(),
+				player.getName());
+		
+		DatabaseUtils.database.update(requestStr);
+	}
+	
+	public static ArrayList<SimplePlayer> getPlayersInTeam(int teamID) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$splayer.username FROM %1$splayer " + 
+				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
+				"WHERE %1$steam_member.team_id = %2ds",  
+				prefix,
+				teamID);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		
+		while (results.next()) {
+			//players.add(new SimplePlayer)
+		}
+		
+		return players;
+	}
 	
 	/**
 	 * Gets the score of the player in the given tournament
