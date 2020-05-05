@@ -19,6 +19,7 @@ public class TournamentRoot extends Command {
 		super(parent);
 		
 		addChild(new Create(this));
+		addChild(new Enable(this));
 	}
 
 	@Override

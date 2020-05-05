@@ -15,7 +15,7 @@ import com.atlshearer.tournamentmanager.TournamentManager;
 
 public abstract class Command implements CommandExecutor, TabCompleter {	
 	
-	private HashMap<String, Command> children = new HashMap<String, Command>();
+	protected HashMap<String, Command> children = new HashMap<String, Command>();
 	protected TournamentManager plugin = (TournamentManager) Bukkit.getPluginManager().getPlugin("TournamentManager");
 	protected String permissionWarning = ChatColor.RED + "You do not have access to that command.";
 	public final String permission;

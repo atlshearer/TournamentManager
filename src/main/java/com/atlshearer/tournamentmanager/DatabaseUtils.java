@@ -203,6 +203,37 @@ public class DatabaseUtils {
 		return team;
 	}
 	
+	/**
+	 * Gets the team of the given name from database
+	 * 
+	 * @param teamName
+	 * @param tournament
+	 * @return Team if a team was found or null
+	 * @throws SQLException
+	 */
+	public static Team getTeamByName(String teamName, Tournament tournament) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$steam_score.team_id, %1$steam_score.team_name, %1$steam_score.score FROM %1$steam_score " +
+				"WHERE %1$steam_score.team_name = '%2$s' " +
+				"AND %1$steam_score.tournament_id = %3$d;", 
+				prefix,
+				teamName,
+				tournament.id);
+		
+		Team team = null;
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		if (results.next()) {
+			team = new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score"));
+		}
+		
+		results.close();
+		
+		return team;
+	}
+	
 	public static ArrayList<Team> getTeamScores(Tournament tournament) throws SQLException {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 		
@@ -385,9 +416,9 @@ public class DatabaseUtils {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 		
 		String requestStr = String.format(
-				"SELECT %1$splayer.username FROM %1$splayer " + 
+				"SELECT %1$splayer.username, %1$splayer.uuid FROM %1$splayer " + 
 				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
-				"WHERE %1$steam_member.team_id = %2ds",  
+				"WHERE %1$steam_member.team_id = %2$d",  
 				prefix,
 				teamID);
 		
@@ -398,7 +429,33 @@ public class DatabaseUtils {
 		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
 		
 		while (results.next()) {
-			//players.add(new SimplePlayer)
+			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
+		}
+		
+		return players;
+	}
+	
+	public static ArrayList<SimplePlayer> getPlayersInTeam(int teamID, Tournament tournament) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$splayer.uuid, %1$splayer.username, %1$sscore.score FROM %1$splayer " + 
+				"JOIN %1$sscore ON %1$sscore.player_uuid = %1$splayer.uuid " + 
+				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
+				"WHERE %1$sscore.tournament_id = %2$d " + 
+				"AND %1$steam_member.team_id = %3$d",  
+				prefix,
+				tournament.id,
+				teamID);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		
+		while (results.next()) {
+			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username"), results.getInt("score")));
 		}
 		
 		return players;

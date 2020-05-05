@@ -20,6 +20,7 @@ public class TeamRoot extends Command {
 
 		addChild(new Create(this));
 		addChild(new AddPlayer(this));
+		addChild(new Info(this));
 	}
 
 	@Override
@@ -28,7 +29,9 @@ public class TeamRoot extends Command {
 		if (args == null || args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
 			sender.sendMessage(ChatColor.GREEN + "Usage - /tm tournament <tournamen_name> ...");
 		} else if (args.length == 1) {
-			sender.sendMessage("Team name: " + args[0]);
+			pargs.add(args[0]);
+			
+			children.get("info").onCommand(sender, command, label, new String[0], pargs);
 		} else {
 			try {				
 				String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
