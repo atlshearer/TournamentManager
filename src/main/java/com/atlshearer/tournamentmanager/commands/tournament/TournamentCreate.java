@@ -8,13 +8,11 @@ import org.bukkit.command.CommandSender;
 
 import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.commands.Command;
-import com.atlshearer.tournamentmanager.tournament.Tournament;
 
 public class TournamentCreate extends Command {
 
 	public TournamentCreate(Command parent) {
 		super(parent);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

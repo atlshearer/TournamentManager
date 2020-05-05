@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -16,6 +17,7 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 	
 	private HashMap<String, Command> children = new HashMap<String, Command>();
 	protected TournamentManager plugin = (TournamentManager) Bukkit.getPluginManager().getPlugin("TournamentManager");
+	protected String permissionWarning = ChatColor.RED + "You do not have access to that command.";
 	public final String permission;
 	
 	
@@ -58,7 +60,10 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 		
 		if (children.containsKey(args[0])) {
 			String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
-			return children.get(args[0]).onTabComplete(sender, command, alias, newArgs);
+			Command child = children.get(args[0]);
+			if (child.hasPermission(sender)) {
+				return child.onTabComplete(sender, command, alias, newArgs);
+			}
 		}
 		
 		ArrayList<String> suggestions = new ArrayList<String>();
@@ -94,7 +99,12 @@ public abstract class Command implements CommandExecutor, TabCompleter {
 		
 		String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
 		String newLabel = label + ' ' + args[0];
-		children.get(args[0]).onCommand(sender, command, newLabel, newArgs, pargs);
+		Command child = children.get(args[0]);
+		if (child.hasPermission(sender)) {
+			children.get(args[0]).onCommand(sender, command, newLabel, newArgs, pargs);			
+		} else {
+			sender.sendMessage(permissionWarning);
+		}
 	}
 	
 	protected void addChild(Command child) {

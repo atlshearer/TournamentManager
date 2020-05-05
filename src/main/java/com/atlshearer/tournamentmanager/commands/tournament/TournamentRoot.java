@@ -3,7 +3,6 @@ package com.atlshearer.tournamentmanager.commands.tournament;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -25,15 +24,14 @@ public class TournamentRoot extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
+		
 		if (args == null || args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
 			sender.sendMessage(ChatColor.GREEN + "Usage - /tm tournament <tournamen_name> ...");
 		} else if (args.length == 1) {
 			// Only tournament name is entered
 			sender.sendMessage("Tournament name: " + args[0]);
 		} else {
-			try {
-				// Rearrange args so that next sub-command is args[0]
-				
+			try {				
 				String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
 				pargs.add(args[0]);
 				
