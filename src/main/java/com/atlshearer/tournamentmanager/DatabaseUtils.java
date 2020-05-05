@@ -166,7 +166,28 @@ public class DatabaseUtils {
 		Team team = null;
 		
 		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
-		if (results != null) {
+		if (results.next()) {
+			team = new Team(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.close();
+		
+		return team;
+	}
+	
+	public static Team getTeamByName(String teamName) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
+				"WHERE %1$steam.name = '%2$s'", 
+				prefix,
+				teamName);
+		
+		Team team = null;
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
 		}
 		

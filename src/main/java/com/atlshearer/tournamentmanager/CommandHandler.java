@@ -30,13 +30,12 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		commands = new HashMap < String, SubCommand > ();
 		
 		// Load commands
-		addCommand(new Join(this.plugin));
+		/*addCommand(new Join(this.plugin));
 		addCommand(new ListTeams(this.plugin));
 		addCommand(new Test());
 		addCommand(new TeamInfo(this.plugin));
 		addCommand(new Leave(this.plugin));
 		addCommand(new ListTournaments(this.plugin));
-		addCommand(new CreateTeam(this.plugin));
 		addCommand(new TournamentAddTeam(this.plugin));
 		addCommand(new AddPlayer(this.plugin));
 		addCommand(new TeamAddPlayer(this.plugin));
@@ -45,7 +44,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 		addCommand(new GetPlayerScore(this.plugin));
 		addCommand(new SetPlayerScore(this.plugin));
 		addCommand(new GetTeamScore(this.plugin));
-		addCommand(new Leaderboard(this.plugin));
+		addCommand(new Leaderboard(this.plugin));*/
 		
 		// Add help command to tabCompletion
 		tabCompletionList.add("help");
