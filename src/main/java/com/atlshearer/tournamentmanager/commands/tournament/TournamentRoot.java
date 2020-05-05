@@ -1,14 +1,18 @@
 package com.atlshearer.tournamentmanager.commands.tournament;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.InvalidCommandNameException;
+import com.atlshearer.tournamentmanager.tournament.Tournament;
 
 public class TournamentRoot extends Command {
 
@@ -43,23 +47,29 @@ public class TournamentRoot extends Command {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
+		ArrayList<String> suggestions = new ArrayList<String>();
+		ArrayList<String> tournamentNames = new ArrayList<String>();
+		
 		
 		if (args == null || args.length == 0) {
 			return new ArrayList<String>();
 		}
 		
-		// Load all tournament names
-		ArrayList<String> tournamentNames = new ArrayList<String>();
-		tournamentNames.add("a_tournament_name");
 		
-		// Check if given name is in there
-			// if yes pass to super function super.onTabComplete without tournament name
-			// else suggest from tournament list
-		if (tournamentNames.contains(args[0])) {
-			return super.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
+		try {
+			for (Tournament tournament : DatabaseUtils.getTournaments()) {
+				tournamentNames.add(tournament.name);
+			}
+		} catch (SQLException e) {
+			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
+			e.printStackTrace();
 		}
 		
-		ArrayList<String> suggestions = new ArrayList<String>();
+		
+		if (tournamentNames.contains(args[0])) {
+			return super.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
+		}		
+		
 		
 		for (String name : tournamentNames) {
 			if (name.toLowerCase().startsWith(args[0].toLowerCase())) {

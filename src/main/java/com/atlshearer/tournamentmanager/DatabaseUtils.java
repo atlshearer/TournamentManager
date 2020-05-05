@@ -235,6 +235,55 @@ public class DatabaseUtils {
 		DatabaseUtils.database.update(requestStr);
 	}
 	
+	public static ArrayList<Tournament> getTournaments() throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament",
+				prefix);
+		
+		ArrayList<Tournament> tournaments = new ArrayList<Tournament>();
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		
+		while (results.next()) {
+			tournaments.add(new Tournament(results.getInt("id"), results.getString("name")));
+		}
+		
+		results.getStatement().close();
+		
+		return tournaments;
+	}
+	
+	/**
+	 * Searches the database for a tournament with the given name
+	 * 
+	 * @param tournamentName
+	 * @return Tournament if a tournament is found or null
+	 * @throws SQLException
+	 */
+	public static Tournament getTournamentByName(String tournamentName) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament " +
+				"WHERE %1$stournament.name = '%2$s'", 
+				prefix,
+				tournamentName);
+		
+		Tournament tournament = null;
+		
+		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		
+		if (results.next()) {
+			tournament = new Tournament(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.getStatement().close();
+		
+		return tournament;
+	}
+	
 	/**
 	 * Gets the specified tournament
 	 * 
