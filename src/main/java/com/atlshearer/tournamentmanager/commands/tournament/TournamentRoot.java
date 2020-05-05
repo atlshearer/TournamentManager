@@ -18,7 +18,7 @@ public class TournamentRoot extends Command {
 	public TournamentRoot(Command parent) {
 		super(parent);
 		
-		addChild(new TournamentCreate(this));
+		addChild(new Create(this));
 	}
 
 	@Override

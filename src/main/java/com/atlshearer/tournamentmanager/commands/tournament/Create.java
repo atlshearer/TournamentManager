@@ -9,9 +9,9 @@ import org.bukkit.command.CommandSender;
 import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.commands.Command;
 
-public class TournamentCreate extends Command {
+public class Create extends Command {
 
-	public TournamentCreate(Command parent) {
+	public Create(Command parent) {
 		super(parent);
 	}
 

@@ -18,7 +18,7 @@ public class TeamRoot extends Command {
 	public TeamRoot(Command parent) {
 		super(parent);
 
-		addChild(new TeamCreate(this));
+		addChild(new Create(this));
 	}
 
 	@Override
