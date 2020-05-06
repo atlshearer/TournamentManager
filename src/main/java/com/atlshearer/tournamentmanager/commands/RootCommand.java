@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.atlshearer.tournamentmanager.commands.leaderboard.LeaderboardRoot;
 import com.atlshearer.tournamentmanager.commands.player.ListPlayers;
 import com.atlshearer.tournamentmanager.commands.player.PlayerRoot;
 import com.atlshearer.tournamentmanager.commands.team.ListTeams;
@@ -26,6 +27,8 @@ public class RootCommand extends Command {
 		addChild(new ListPlayers(this));
 		addChild(new ListTeams(this));
 		addChild(new ListTournament(this));
+		
+		addChild(new LeaderboardRoot(this));
 	}
 	
 	@Override

@@ -641,4 +641,37 @@ public class DatabaseUtils {
 		
 		return players;
 	}
+	
+	/**
+	 * Gets all players in database with score
+	 * 
+	 * @param name
+	 * @return ArrayList<SimplePlayer> of players ordered by score DESC
+	 * @throws SQLException
+	 */
+	public static ArrayList<SimplePlayer> getPlayers(Tournament tournament) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$splayer.uuid, %1$splayer.username, %1$sscore.score FROM %1$splayer " + 
+				"JOIN %1$sscore ON %1$sscore.player_uuid = %1$splayer.uuid " +
+				"WHERE %1$sscore.tournament_id = %2$d " +
+				"ORDER BY %1$sscore.score DESC", 
+				prefix,
+				tournament.id);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		while (results.next()) {
+			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username"), results.getInt("score")));
+		}
+		
+		results.getStatement().close();
+		
+		return players;
+	}
 }
