@@ -18,7 +18,9 @@ import pro.husk.mysql.MySQL;
 public class DatabaseUtils {
 	
 	private static TournamentManager plugin;
-	public static MySQL database;
+	private static MySQL database;
+	
+	private DatabaseUtils() {};
 	
 	public static void onEnable(TournamentManager plugin) {
 		DatabaseUtils.plugin = plugin;
@@ -84,6 +86,14 @@ public class DatabaseUtils {
 		}
 	}
 
+	public static void onDisable() {
+		try {
+			database.closeConnection();
+		} catch (SQLException e) {
+			DatabaseUtils.plugin.getLogger().warning("An error occured while trying to close the database connection.");
+			e.printStackTrace();
+		}
+	}
 	
 	// Team	
 	public static void createTeam(String name) throws SQLException {
@@ -114,7 +124,7 @@ public class DatabaseUtils {
 		
 		ArrayList<Team> teams = new ArrayList<Team>();
 		
-		DatabaseUtils.plugin.database.query(requestStr, results -> {
+		DatabaseUtils.database.query(requestStr, results -> {
 			if (results != null) {
 				while(results.next()) {
 					teams.add(new Team(results.getInt("id"), results.getString("name")));
@@ -144,7 +154,7 @@ public class DatabaseUtils {
 		
 		ArrayList<Team> teams = new ArrayList<Team>();
 		
-		DatabaseUtils.plugin.database.query(requestStr, results -> {
+		DatabaseUtils.database.query(requestStr, results -> {
 			if (results != null) {
 				while(results.next()) {
 					teams.add(new Team(results.getInt("id"), results.getString("name")));
@@ -166,7 +176,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
 		}
@@ -194,7 +204,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
 		}
@@ -225,7 +235,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score"));
 		}
@@ -333,7 +343,7 @@ public class DatabaseUtils {
 		
 		ArrayList<Tournament> tournaments = new ArrayList<Tournament>();
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
 		while (results.next()) {
 			tournaments.add(new Tournament(results.getInt("id"), results.getString("name")));
@@ -362,7 +372,7 @@ public class DatabaseUtils {
 		
 		Tournament tournament = null;
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
 		if (results.next()) {
 			tournament = new Tournament(results.getInt("id"), results.getString("name"));
@@ -391,7 +401,7 @@ public class DatabaseUtils {
 		
 		Tournament tournament = null;
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
 		if (results.next()) {
 			tournament = new Tournament(results.getInt("id"), results.getString("name"));
@@ -432,7 +442,7 @@ public class DatabaseUtils {
 				team.id);
 		
 		
-		ResultSet results = DatabaseUtils.plugin.database.query(requestStr);
+		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
 		Boolean inTournament = results.next();
 				

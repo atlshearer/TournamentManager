@@ -1,7 +1,5 @@
 package com.atlshearer.tournamentmanager;
 
-import java.sql.SQLException;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.atlshearer.tournamentmanager.commands.Command;
@@ -13,11 +11,8 @@ import com.atlshearer.tournamentmanager.tournament.Tournament;
 import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 import com.atlshearer.tournamentmanager.utils.PlayerUtils;
 
-import pro.husk.mysql.MySQL;
-
 public class TournamentManager extends JavaPlugin {
 	public Command rootCommand;
-	public MySQL database;
 	
 	private Tournament tournament;
 	
@@ -30,8 +25,6 @@ public class TournamentManager extends JavaPlugin {
 		// Enable database
 		DatabaseUtils.onEnable(this);
 		PlayerUtils.onEnable(this);
-		// TODO remove this statement
-		this.database = DatabaseUtils.database;
 		
 		// Enable command handling
 		rootCommand = new RootCommand();
@@ -50,12 +43,7 @@ public class TournamentManager extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		try {
-			database.closeConnection();
-		} catch (SQLException e) {
-			this.getLogger().warning("An error occured while trying to close the database connection.");
-			e.printStackTrace();
-		}
+		DatabaseUtils.onDisable();
 	}
 	
 	public boolean isTournamentEnabled() {
