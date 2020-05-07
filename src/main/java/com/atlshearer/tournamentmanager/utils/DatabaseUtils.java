@@ -1,7 +1,5 @@
 package com.atlshearer.tournamentmanager.utils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,11 +19,15 @@ public class DatabaseUtils {
 	private static TournamentManager plugin;
 	private static MySQL database;
 	private static String tablePrefix;
+	private static boolean debugOutput;
 	
 	private DatabaseUtils() {}
 	
 	public static void onEnable(TournamentManager plugin) {
 		DatabaseUtils.plugin = plugin;
+		
+		// TODO flag...
+		DatabaseUtils.debugOutput = true;
 		
 		DatabaseUtils.database = new MySQL(
 				DatabaseUtils.plugin.getConfig().getString("data.address"), 
@@ -98,6 +100,21 @@ public class DatabaseUtils {
 		}
 	}
 	
+	
+	private static int update(String update) throws SQLException {
+		if (DatabaseUtils.debugOutput) {
+			DatabaseUtils.plugin.getLogger().info(update);
+		}
+		return DatabaseUtils.database.update(update);
+	}
+	
+	private static ResultSet query(String query) throws SQLException {
+		if (DatabaseUtils.debugOutput) {
+			DatabaseUtils.plugin.getLogger().info(query);
+		}
+		return DatabaseUtils.database.query(query);
+	}
+	
 	// Team	
 	public static void createTeam(String name) throws SQLException {
 		String requestStr = String.format(
@@ -105,7 +122,7 @@ public class DatabaseUtils {
 				tablePrefix,
 				name);
 		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 	}
 
 	
@@ -123,13 +140,13 @@ public class DatabaseUtils {
 		
 		ArrayList<Team> teams = new ArrayList<>();
 		
-		DatabaseUtils.database.query(requestStr, results -> {
-			if (results != null) {
-				while(results.next()) {
-					teams.add(new Team(results.getInt("id"), results.getString("name")));
-				}
+		ResultSet results = query(requestStr);
+		
+		while(results.next()) {
+			while(results.next()) {
+				teams.add(new Team(results.getInt("id"), results.getString("name")));
 			}
-		});
+		}
 		
 		return teams;
 	}
@@ -151,13 +168,15 @@ public class DatabaseUtils {
 		
 		ArrayList<Team> teams = new ArrayList<>();
 		
-		DatabaseUtils.database.query(requestStr, results -> {
-			if (results != null) {
-				while(results.next()) {
-					teams.add(new Team(results.getInt("id"), results.getString("name")));
-				}
+		ResultSet results = query(requestStr);
+		
+		while(results.next()) {
+			while(results.next()) {
+				teams.add(new Team(results.getInt("id"), results.getString("name")));
 			}
-		});
+		}
+		
+		results.close();
 		
 		return teams;
 	}
@@ -171,7 +190,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
 		}
@@ -197,7 +216,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
 		}
@@ -226,7 +245,7 @@ public class DatabaseUtils {
 		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		if (results.next()) {
 			team = new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score"));
 		}
@@ -242,11 +261,9 @@ public class DatabaseUtils {
 				"WHERE %1$steam_score.tournament_id = %2$d " +
 				"ORDER BY score DESC;", 
 				tablePrefix,
-				tournament.id);
+				tournament.id);		
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		ArrayList<Team> teams = new ArrayList<>();
 		
@@ -264,11 +281,9 @@ public class DatabaseUtils {
 				"AND %1$steam_score.team_id = %3$d;", 
 				tablePrefix,
 				tournament.id,
-				teamID);
+				teamID);		
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		int score = 0;
 		
@@ -286,9 +301,7 @@ public class DatabaseUtils {
 				player.uuid,
 				team.id);
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 	}
 	
 	public static void removePlayerFromTeam(SimplePlayer player, Team team) throws SQLException {
@@ -300,21 +313,17 @@ public class DatabaseUtils {
 				player.uuid,
 				team.id);
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 	}
 	
 	// Tournament
 	public static void createTournament(String name) throws SQLException {
-		
-		
 		String requestStr = String.format(
 				"INSERT INTO %1$stournament (name) VALUE ('%2$s');", 
 				tablePrefix,
 				name);
 		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 	}
 	
 	public static List<Tournament> getTournaments() throws SQLException {
@@ -324,7 +333,7 @@ public class DatabaseUtils {
 		
 		ArrayList<Tournament> tournaments = new ArrayList<>();
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		while (results.next()) {
 			tournaments.add(new Tournament(results.getInt("id"), results.getString("name")));
@@ -351,7 +360,7 @@ public class DatabaseUtils {
 		
 		Tournament tournament = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		if (results.next()) {
 			tournament = new Tournament(results.getInt("id"), results.getString("name"));
@@ -378,7 +387,7 @@ public class DatabaseUtils {
 		
 		Tournament tournament = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		if (results.next()) {
 			tournament = new Tournament(results.getInt("id"), results.getString("name"));
@@ -396,7 +405,7 @@ public class DatabaseUtils {
 				teamID,
 				tournamentID);
 		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 		
 		// Find all players in team
 	}
@@ -413,9 +422,8 @@ public class DatabaseUtils {
 				tablePrefix,
 				tournament.id,
 				team.id);
-		
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+			
+		ResultSet results = query(requestStr);
 		
 		Boolean inTournament = results.next();
 				
@@ -432,7 +440,7 @@ public class DatabaseUtils {
 				player.getUniqueId(),
 				player.getName());
 		
-		DatabaseUtils.database.update(requestStr);
+		update(requestStr);
 	}
 	
 	public static List<SimplePlayer> getPlayersInTeam(int teamID) throws SQLException {
@@ -441,11 +449,9 @@ public class DatabaseUtils {
 				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
 				"WHERE %1$steam_member.team_id = %2$d",  
 				tablePrefix,
-				teamID);
+				teamID);		
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
@@ -467,9 +473,7 @@ public class DatabaseUtils {
 				tournament.id,
 				teamID);
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
@@ -495,11 +499,9 @@ public class DatabaseUtils {
 				"AND %1$sscore.player_uuid = '%3$s';", 
 				tablePrefix,
 				tournament.id,
-				uuid);
+				uuid);		
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		int score = 0;
 		
@@ -509,7 +511,6 @@ public class DatabaseUtils {
 		
 		return score;
 	}
-	
 	
 	/**
 	 * Checks if the player has a score in the given tournament
@@ -527,11 +528,9 @@ public class DatabaseUtils {
 				"AND %1$sscore.player_uuid = '%3$s');", 
 				tablePrefix,
 				tournament.id,
-				uuid);
-			
-		DatabaseUtils.plugin.getLogger().info(requestStr);
+				uuid);		
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		boolean exists = false;
 		
@@ -572,7 +571,7 @@ public class DatabaseUtils {
 					score);
 		}
 		
-		database.update(requestStr);
+		update(requestStr);
 	}
 	
 	/**
@@ -594,7 +593,7 @@ public class DatabaseUtils {
 				uuid,
 				score);
 		
-		database.update(requestStr);
+		update(requestStr);
 	}
 	
 	/**
@@ -613,7 +612,7 @@ public class DatabaseUtils {
 		
 		SimplePlayer player = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		if (results.next()) {
 			player = new SimplePlayer(results.getString("uuid"), results.getString("username"));
@@ -638,7 +637,7 @@ public class DatabaseUtils {
 		
 		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		while (results.next()) {
 			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
@@ -663,13 +662,11 @@ public class DatabaseUtils {
 				"WHERE %1$sscore.tournament_id = %2$d " +
 				"ORDER BY %1$sscore.score DESC", 
 				tablePrefix,
-				tournament.id);
-		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
+				tournament.id);		
 		
 		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		while (results.next()) {
 			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username"), results.getInt("score")));
@@ -695,11 +692,9 @@ public class DatabaseUtils {
 				tablePrefix,
 				uuid);
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));
@@ -728,11 +723,9 @@ public class DatabaseUtils {
 				uuid,
 				teamName);
 		
-		DatabaseUtils.plugin.getLogger().info(requestStr);
-		
 		Team team = null;
 		
-		ResultSet results = DatabaseUtils.database.query(requestStr);
+		ResultSet results = query(requestStr);
 		
 		if (results.next()) {
 			team = new Team(results.getInt("id"), results.getString("name"));

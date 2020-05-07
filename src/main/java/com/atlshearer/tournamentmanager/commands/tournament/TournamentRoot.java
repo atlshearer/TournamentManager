@@ -59,7 +59,8 @@ public class TournamentRoot extends Command {
 		
 		
 		try {
-			for (Tournament tournament : DatabaseUtils.getTournaments()) {
+			List<Tournament> tournaments = DatabaseUtils.getTournaments();
+			for (Tournament tournament : tournaments) {
 				tournamentNames.add(tournament.name);
 			}
 		} catch (SQLException e) {
