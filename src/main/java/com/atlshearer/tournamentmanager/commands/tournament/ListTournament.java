@@ -26,7 +26,7 @@ public class ListTournament extends Command {
 		}
 		
 		try {
-			ArrayList<Tournament> tournaments = DatabaseUtils.getTournaments();
+			List<Tournament> tournaments = DatabaseUtils.getTournaments();
 			
 			if (tournaments.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No tournaments found....");

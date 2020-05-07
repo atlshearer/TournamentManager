@@ -41,7 +41,7 @@ public class Info extends Command {
 				return;
 			}
 			
-			ArrayList<SimplePlayer> players = null;
+			List<SimplePlayer> players = null;
 			
 			if (plugin.isTournamentEnabled() && team.score != null) {
 				players = DatabaseUtils.getPlayersInTeam(team.id, plugin.getCurrentTournament());

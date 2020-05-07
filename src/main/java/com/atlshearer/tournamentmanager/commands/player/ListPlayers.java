@@ -26,7 +26,7 @@ public class ListPlayers extends Command {
 		}
 		
 		try {
-			ArrayList<SimplePlayer> players = DatabaseUtils.getPlayers();
+			List<SimplePlayer> players = DatabaseUtils.getPlayers();
 			
 			if (players.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No players found....");

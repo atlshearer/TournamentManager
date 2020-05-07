@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
@@ -19,8 +20,9 @@ public class DatabaseUtils {
 	
 	private static TournamentManager plugin;
 	private static MySQL database;
+	private static String tablePrefix;
 	
-	private DatabaseUtils() {};
+	private DatabaseUtils() {}
 	
 	public static void onEnable(TournamentManager plugin) {
 		DatabaseUtils.plugin = plugin;
@@ -33,43 +35,44 @@ public class DatabaseUtils {
 				DatabaseUtils.plugin.getConfig().getString("data.password"), 
 				"useSSL=false");
 		try {
-			String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "player ("+
+			tablePrefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "player ("+
 							"uuid VARCHAR(36) NOT NULL," + 
 							"username VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (uuid));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "team (" +
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team (" +
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "team_member (" +
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team_member (" +
 							"player_uuid VARCHAR(36) NOT NULL REFERENCES player(uuid)," +
 							"team_id INT NOT NULL REFERENCES team(id)," +
 							"CONSTRAINT team_member_pkey PRIMARY KEY (player_uuid, team_id)," +
-							"FOREIGN KEY(player_uuid) REFERENCES " + prefix + "player(uuid)," +
-							"FOREIGN KEY(team_id)     REFERENCES " + prefix + "team(id));");
+							"FOREIGN KEY(player_uuid) REFERENCES " + tablePrefix + "player(uuid)," +
+							"FOREIGN KEY(team_id)     REFERENCES " + tablePrefix + "team(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament (" + 
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "score (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "score (" + 
 							"tournament_id INT NOT NULL," + 
 							"player_uuid VARCHAR(36) NOT NULL," + 
 							"score INT NOT NULL," + 
 							"CONSTRAINT score_pkey PRIMARY KEY (player_uuid, tournament_id)," + 
-							"FOREIGN KEY(player_uuid)   REFERENCES " + prefix + "player(uuid)," + 
-							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id));");
+							"FOREIGN KEY(player_uuid)   REFERENCES " + tablePrefix + "player(uuid)," + 
+							"FOREIGN KEY(tournament_id) REFERENCES " + tablePrefix + "tournament(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + prefix + "tournament_team (" + 
+			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament_team (" + 
 							"tournament_id INT NOT NULL," + 
 							"team_id INT NOT NULL," + 
 							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id)," +
-							"FOREIGN KEY(tournament_id) REFERENCES " + prefix + "tournament(id)," +
-							"FOREIGN KEY(team_id)       REFERENCES " + prefix + "team(id));");
+							"FOREIGN KEY(tournament_id) REFERENCES " + tablePrefix + "tournament(id)," +
+							"FOREIGN KEY(team_id)       REFERENCES " + tablePrefix + "team(id));");
 			
 			database.update(String.format(
 					"CREATE OR REPLACE VIEW %1$steam_score AS " + 
@@ -78,7 +81,7 @@ public class DatabaseUtils {
 					"JOIN %1$steam ON %1$steam.id = %1$steam_member.team_id " + 
 					"JOIN %1$stournament_team ON %1$stournament_team.team_id = %1$steam.id " + 
 					"WHERE %1$stournament_team.tournament_id = %1$sscore.tournament_id " + 
-					"GROUP BY %1$steam.id, %1$sscore.tournament_id", prefix));
+					"GROUP BY %1$steam.id, %1$sscore.tournament_id", tablePrefix));
 			
 		} catch (SQLException e) {
 			DatabaseUtils.plugin.getLogger().warning("Was not able to access database. See stack trace.");
@@ -97,11 +100,9 @@ public class DatabaseUtils {
 	
 	// Team	
 	public static void createTeam(String name) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"INSERT INTO %1$steam (name) VALUE ('%2$s');", 
-				prefix,
+				tablePrefix,
 				name);
 		
 		DatabaseUtils.database.update(requestStr);
@@ -115,14 +116,12 @@ public class DatabaseUtils {
 	 * @return ArrayList<Team> of all teams
 	 * @throws SQLException 
 	 */
-	public static ArrayList<Team> getTeams() throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-			
+	public static List<Team> getTeams() throws SQLException {			
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam;", 
-				prefix);
+				tablePrefix);
 		
-		ArrayList<Team> teams = new ArrayList<Team>();
+		ArrayList<Team> teams = new ArrayList<>();
 		
 		DatabaseUtils.database.query(requestStr, results -> {
 			if (results != null) {
@@ -142,17 +141,15 @@ public class DatabaseUtils {
 	 * @return ArrayList<Team> of teams in tournament
 	 * @throws SQLException
 	 */
-	public static ArrayList<Team> getTeams(Tournament tournament) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<Team> getTeams(Tournament tournament) throws SQLException {		
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
 				"JOIN %1$stournament_team ON %1$stournament_team.team_id = %1$steam.id " +
 				"WHERE %1$stournament_team.tournament_id = %2$d", 
-				prefix,
+				tablePrefix,
 				tournament.id);
 		
-		ArrayList<Team> teams = new ArrayList<Team>();
+		ArrayList<Team> teams = new ArrayList<>();
 		
 		DatabaseUtils.database.query(requestStr, results -> {
 			if (results != null) {
@@ -166,12 +163,10 @@ public class DatabaseUtils {
 	}
 	
 	public static Team getTeamByID(int teamID) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
 				"WHERE %1$steam.id = %2$d", 
-				prefix,
+				tablePrefix,
 				teamID);
 		
 		Team team = null;
@@ -194,12 +189,10 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static Team getTeamByName(String teamName) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
 				"WHERE %1$steam.name = '%2$s'", 
-				prefix,
+				tablePrefix,
 				teamName);
 		
 		Team team = null;
@@ -223,13 +216,11 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static Team getTeamByName(String teamName, Tournament tournament) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$steam_score.team_id, %1$steam_score.team_name, %1$steam_score.score FROM %1$steam_score " +
 				"WHERE %1$steam_score.team_name = '%2$s' " +
 				"AND %1$steam_score.tournament_id = %3$d;", 
-				prefix,
+				tablePrefix,
 				teamName,
 				tournament.id);
 		
@@ -245,37 +236,33 @@ public class DatabaseUtils {
 		return team;
 	}
 	
-	public static ArrayList<Team> getTeamScores(Tournament tournament) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<Team> getTeamScores(Tournament tournament) throws SQLException {
 		String requestStr = String.format(
 				"SELECT team_id, team_name, score FROM %1$steam_score " +
 				"WHERE %1$steam_score.tournament_id = %2$d " +
 				"ORDER BY score DESC;", 
-				prefix,
+				tablePrefix,
 				tournament.id);
 		
 		DatabaseUtils.plugin.getLogger().info(requestStr);
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
-		ArrayList<Team> teams = new ArrayList<Team>();
+		ArrayList<Team> teams = new ArrayList<>();
 		
 		while (results.next()) {
-			teams.add(new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score")));;
+			teams.add(new Team(results.getInt("team_id"), results.getString("team_name"), results.getInt("score")));
 		}
 		
 		return teams; 
 	}
 	
-	public static int getTeamScoreByID(Tournament tournament, int teamID) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static int getTeamScoreByID(Tournament tournament, int teamID) throws SQLException {		
 		String requestStr = String.format(
 				"SELECT score FROM %1$steam_score " +
 				"WHERE %1$steam_score.tournament_id = %2$d " +
 				"AND %1$steam_score.team_id = %3$d;", 
-				prefix,
+				tablePrefix,
 				tournament.id,
 				teamID);
 		
@@ -293,11 +280,9 @@ public class DatabaseUtils {
 	}
 	
 	public static void addPlayerToTeam(SimplePlayer player, Team team) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"INSERT INTO %1$steam_member (player_uuid, team_id) VALUE ('%2$s', %3$s);", 
-				prefix,
+				tablePrefix,
 				player.uuid,
 				team.id);
 		
@@ -307,13 +292,11 @@ public class DatabaseUtils {
 	}
 	
 	public static void removePlayerFromTeam(SimplePlayer player, Team team) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"DELETE FROM %1$steam_member " + 
 				"WHERE %1$steam_member.player_uuid = '%2$s' " + 
 				"AND %1$steam_member.team_id = %3$d;", 
-				prefix,
+				tablePrefix,
 				player.uuid,
 				team.id);
 		
@@ -324,24 +307,22 @@ public class DatabaseUtils {
 	
 	// Tournament
 	public static void createTournament(String name) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
 		
 		String requestStr = String.format(
 				"INSERT INTO %1$stournament (name) VALUE ('%2$s');", 
-				prefix,
+				tablePrefix,
 				name);
 		
 		DatabaseUtils.database.update(requestStr);
 	}
 	
-	public static ArrayList<Tournament> getTournaments() throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<Tournament> getTournaments() throws SQLException {
 		String requestStr = String.format(
 				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament",
-				prefix);
+				tablePrefix);
 		
-		ArrayList<Tournament> tournaments = new ArrayList<Tournament>();
+		ArrayList<Tournament> tournaments = new ArrayList<>();
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
@@ -362,12 +343,10 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static Tournament getTournamentByName(String tournamentName) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament " +
 				"WHERE %1$stournament.name = '%2$s'", 
-				prefix,
+				tablePrefix,
 				tournamentName);
 		
 		Tournament tournament = null;
@@ -391,12 +370,10 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static Tournament getTournamentByID(int tournamentID) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament " +
 				"WHERE %1$stournament.id = %2$d", 
-				prefix,
+				tablePrefix,
 				tournamentID);
 		
 		Tournament tournament = null;
@@ -413,11 +390,9 @@ public class DatabaseUtils {
 	}
 	
 	public static void addTeamToTournament(int tournamentID, int teamID) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"INSERT INTO %1$stournament_team (team_id, tournament_id) VALUE (%2$d, %3$d);", 
-				prefix,
+				tablePrefix,
 				teamID,
 				tournamentID);
 		
@@ -431,13 +406,11 @@ public class DatabaseUtils {
 	}
 	
 	public static boolean isTeamInTournament(Tournament tournament, Team team) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT * FROM %1$stournament_team " + 
 				"WHERE tournament_id = %2$d " + 
 				"AND team_id = %3$d", 
-				prefix,
+				tablePrefix,
 				tournament.id,
 				team.id);
 		
@@ -453,32 +426,28 @@ public class DatabaseUtils {
 	
 	// Player
 	public static void addPlayer(Player player) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"INSERT INTO %1$splayer (uuid, username) VALUE ('%2$s', '%3$s');", 
-				prefix,
+				tablePrefix,
 				player.getUniqueId(),
 				player.getName());
 		
 		DatabaseUtils.database.update(requestStr);
 	}
 	
-	public static ArrayList<SimplePlayer> getPlayersInTeam(int teamID) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<SimplePlayer> getPlayersInTeam(int teamID) throws SQLException {
 		String requestStr = String.format(
 				"SELECT %1$splayer.username, %1$splayer.uuid FROM %1$splayer " + 
 				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
 				"WHERE %1$steam_member.team_id = %2$d",  
-				prefix,
+				tablePrefix,
 				teamID);
 		
 		DatabaseUtils.plugin.getLogger().info(requestStr);
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
-		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
 		while (results.next()) {
 			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
@@ -487,16 +456,14 @@ public class DatabaseUtils {
 		return players;
 	}
 	
-	public static ArrayList<SimplePlayer> getPlayersInTeam(int teamID, Tournament tournament) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<SimplePlayer> getPlayersInTeam(int teamID, Tournament tournament) throws SQLException {		
 		String requestStr = String.format(
 				"SELECT %1$splayer.uuid, %1$splayer.username, %1$sscore.score FROM %1$splayer " + 
 				"JOIN %1$sscore ON %1$sscore.player_uuid = %1$splayer.uuid " + 
 				"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$splayer.uuid " + 
 				"WHERE %1$sscore.tournament_id = %2$d " + 
 				"AND %1$steam_member.team_id = %3$d",  
-				prefix,
+				tablePrefix,
 				tournament.id,
 				teamID);
 		
@@ -504,7 +471,7 @@ public class DatabaseUtils {
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
-		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
 		while (results.next()) {
 			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username"), results.getInt("score")));
@@ -522,13 +489,11 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static int getPlayerScore(Tournament tournament, String uuid) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$sscore.tournament_id, %1$sscore.player_uuid, %1$sscore.score FROM %1$sscore " +
 				"WHERE %1$sscore.tournament_id = %2$d " +
 				"AND %1$sscore.player_uuid = '%3$s';", 
-				prefix,
+				tablePrefix,
 				tournament.id,
 				uuid);
 		
@@ -547,6 +512,37 @@ public class DatabaseUtils {
 	
 	
 	/**
+	 * Checks if the player has a score in the given tournament
+	 * 
+	 * @param tournament
+	 * @param uuid
+	 * @return true iff a score record exists
+	 * @throws SQLException
+	 */
+	public static boolean doesPlayerScoreExist(Tournament tournament, String uuid) throws SQLException {
+		String requestStr = String.format(
+				"SELECT EXISTS(" + 
+				"SELECT 1 FROM %1$sscore " + 
+				"WHERE %1$sscore.tournament_id = %2$d " + 
+				"AND %1$sscore.player_uuid = '%3$s');", 
+				tablePrefix,
+				tournament.id,
+				uuid);
+			
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		boolean exists = false;
+		
+		if (results.next()) {
+			exists = results.getInt(1) == 1;
+		}
+		
+		return exists;
+	}
+	
+	/**
 	 * Sets the score of player for given tournament
 	 * 
 	 * @param tournament
@@ -555,38 +551,28 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static void setPlayerScore(Tournament tournament, String uuid, int score) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		String requestStr;
 		
-		String requestStr = String.format(
-				"SELECT %1$sscore.tournament_id, %1$sscore.player_uuid, %1$sscore.score FROM %1$sscore " +
-				"WHERE %1$sscore.tournament_id = %2$d " +
-				"AND %1$sscore.player_uuid = '%3$s';", 
-				prefix,
-				tournament.id,
-				uuid);
-		
-		Connection connection = database.getConnection();
-		PreparedStatement statment = connection.prepareStatement(
-				requestStr,
-				ResultSet.TYPE_SCROLL_INSENSITIVE,
-				ResultSet.CONCUR_UPDATABLE);
-		ResultSet results = statment.executeQuery();
-		
-		if (!results.next()) {
-			// No results found
-			results.moveToInsertRow();
-			results.updateInt("tournament_id", tournament.id);
-			results.updateString("player_uuid", uuid);
-			results.updateInt("score", score);
-			results.insertRow();
-			results.moveToCurrentRow();
+		if (doesPlayerScoreExist(tournament, uuid)) {
+			requestStr = String.format(
+					"UPDATE %1$sscore " + 
+					"SET %1$sscore.score = %4$d " + 
+					"WHERE %1$sscore.tournament_id = %3$d AND %1$sscore.player_uuid = '%2$s'",
+					tablePrefix,
+					uuid,
+					tournament.id,
+					score);
 		} else {
-			results.updateInt("score", score);
-			results.updateRow();
+			requestStr = String.format(
+					"INSERT INTO %1$sscore (player_uuid, tournament_id, score) " +
+					"VALUES ('%2$s', %3$d, %4$d);",
+					tablePrefix,
+					uuid,
+					tournament.id,
+					score);
 		}
 		
-		results.getStatement().close();
-		
+		database.update(requestStr);
 	}
 	
 	/**
@@ -598,14 +584,12 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static void addToPlayerScore(Tournament tournament, String uuid, int score) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"UPDATE %1$sscore " + 
 				"SET %1$sscore.score = %1$sscore.score + %4$d " + 
 				"WHERE %1$sscore.tournament_id = %2$d " + 
 				"AND %1$sscore.player_uuid = '%3$s'", 
-				prefix,
+				tablePrefix,
 				tournament.id,
 				uuid,
 				score);
@@ -621,12 +605,10 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static SimplePlayer getPlayerByName(String name) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$splayer.uuid, %1$splayer.username FROM %1$splayer " +
 				"WHERE %1$splayer.username = '%2$s';", 
-				prefix,
+				tablePrefix,
 				name);
 		
 		SimplePlayer player = null;
@@ -649,14 +631,12 @@ public class DatabaseUtils {
 	 * @return SimplePlayer with data about player or null
 	 * @throws SQLException
 	 */
-	public static ArrayList<SimplePlayer> getPlayers() throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<SimplePlayer> getPlayers() throws SQLException {
 		String requestStr = String.format(
 				"SELECT %1$splayer.uuid, %1$splayer.username FROM %1$splayer", 
-				prefix);
+				tablePrefix);
 		
-		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
@@ -676,20 +656,18 @@ public class DatabaseUtils {
 	 * @return ArrayList<SimplePlayer> of players ordered by score DESC
 	 * @throws SQLException
 	 */
-	public static ArrayList<SimplePlayer> getPlayers(Tournament tournament) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static List<SimplePlayer> getPlayers(Tournament tournament) throws SQLException {
 		String requestStr = String.format(
 				"SELECT %1$splayer.uuid, %1$splayer.username, %1$sscore.score FROM %1$splayer " + 
 				"JOIN %1$sscore ON %1$sscore.player_uuid = %1$splayer.uuid " +
 				"WHERE %1$sscore.tournament_id = %2$d " +
 				"ORDER BY %1$sscore.score DESC", 
-				prefix,
+				tablePrefix,
 				tournament.id);
 		
 		DatabaseUtils.plugin.getLogger().info(requestStr);
 		
-		ArrayList<SimplePlayer> players = new ArrayList<SimplePlayer>();
+		ArrayList<SimplePlayer> players = new ArrayList<>();
 		
 		ResultSet results = DatabaseUtils.database.query(requestStr);
 		
@@ -710,13 +688,11 @@ public class DatabaseUtils {
 	 * @throws SQLException
 	 */
 	public static Team isPlayerInAnyTeam(String uuid) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " + 
 				"JOIN %1$steam_member ON %1$steam_member.team_id = %1$steam.id " + 
 				"WHERE %1$steam_member.player_uuid = '%2$s'", 
-				prefix,
+				tablePrefix,
 				uuid);
 		
 		DatabaseUtils.plugin.getLogger().info(requestStr);
@@ -742,15 +718,13 @@ public class DatabaseUtils {
 	 * @return Team - A team that the player is in or null if they are in no team
 	 * @throws SQLException
 	 */
-	public static Team isPlayerInTeam(String uuid, String teamName) throws SQLException {
-		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
-		
+	public static Team isPlayerInTeam(String uuid, String teamName) throws SQLException {	
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " + 
 				"JOIN %1$steam_member ON %1$steam_member.team_id = %1$steam.id " + 
 				"WHERE %1$steam_member.player_uuid = '%2$s' " +
 				"AND %1$steam.name = '%3$s';", 
-				prefix,
+				tablePrefix,
 				uuid,
 				teamName);
 		

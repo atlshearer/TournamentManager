@@ -30,7 +30,7 @@ public class Team extends Command {
 		}
 				
 		try {
-			ArrayList<com.atlshearer.tournamentmanager.tournament.Team> teams = 
+			List<com.atlshearer.tournamentmanager.tournament.Team> teams = 
 					DatabaseUtils.getTeamScores(plugin.getCurrentTournament());
 			
 			if (teams.isEmpty()) {

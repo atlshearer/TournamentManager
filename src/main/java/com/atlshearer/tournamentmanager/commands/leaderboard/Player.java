@@ -31,7 +31,7 @@ public class Player extends Command {
 		}
 				
 		try {
-			ArrayList<SimplePlayer> players = 
+			List<SimplePlayer> players = 
 					DatabaseUtils.getPlayers(plugin.getCurrentTournament());
 			
 			if (players.isEmpty()) {
