@@ -1,65 +1,91 @@
 package com.atlshearer.tournamentmanager.commands;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.atlshearer.tournamentmanager.TournamentManager;
 import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
+import com.atlshearer.tournamentmanager.utils.PlayerUtils;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
-public class AddPlayer implements SubCommand {
+public class AddPlayer extends Command {
 	
-	private TournamentManager plugin;
-	
-	public AddPlayer(TournamentManager plugin) {
-		this.plugin = plugin;
+	public AddPlayer(Command parent) {
+		super(parent);
 	}
-
+	
 	@Override
-	public boolean onCommand(Player player, String[] args) {
-		if (args.length > 1) {
-    		player.sendMessage(ChatColor.RED + "Incorrect usage.");
-    		player.sendMessage(help());
-    		return true;
+	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
+			List<String> pargs) {
+		if (args.length != 1) {
+			sender.sendMessage(ChatColor.RED + getHelp());
+			return;
 		}
 		
-		Player target = player;
+		Player target = Bukkit.getPlayer(args[0]);
 		
-		if (args.length == 1) {
-			target = Bukkit.getPlayer(args[0]);
-			
-			if (target == null) {
-				player.sendMessage(ChatColor.RED + "Player not found.");
-				return true;
-			}
+		if (target == null) {
+			sender.sendMessage(ChatColor.RED + "Player not found.");
+			return;
 		}
 		
 		try {
 			DatabaseUtils.addPlayer(target);
 			
-			player.sendMessage(ChatColor.GREEN + target.getName() + " added to database successfully.");
-		} catch (SQLException e) {
-			player.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
+			sender.sendMessage(ChatColor.GREEN + target.getName() + " added to database successfully.");
+		} catch (MySQLIntegrityConstraintViolationException e) {
+			sender.sendMessage(ChatColor.RED + "Player appears to already be in Database. Please check logs.");
+			e.printStackTrace();
+		}  catch (SQLException e) {
+			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
-		
-		return true;
 	}
 
 	@Override
-	public String help() {
+	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
+			String[] args) {
+		ArrayList<String> suggestions = new ArrayList<String>();
+		TreeSet<String> playerNames = new TreeSet<String>();
+		
+		if (args == null || args.length == 0) {
+			return new ArrayList<String>();
+		}
+		
+		try {
+			playerNames = PlayerUtils.getPlayersNamesNotInDB();
+		}catch (SQLException e) {
+			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
+			e.printStackTrace();
+		}
+		
+		for (String name : playerNames) {
+			if (name.toLowerCase().startsWith(args[0].toLowerCase())) {
+				suggestions.add(name);
+			}
+		}
+		
+		return suggestions;
+	}
+	
+	@Override
+	public String getHelp() {
 		return "Usage - /tm addplayer [player_name]";
 	}
 
 	@Override
-	public String permission() {
-		return "tournamentmanager.player.add";
+	public String getName() {
+		return "addplayer";
 	}
-
+	
 	@Override
-	public String name() {
+	public String getBasePermission() {
 		return "addplayer";
 	}
 }

@@ -4,14 +4,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.InvalidCommandNameException;
-import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
-import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
+import com.atlshearer.tournamentmanager.utils.PlayerUtils;
 
 public class PlayerRoot extends Command {
 
@@ -19,6 +19,7 @@ public class PlayerRoot extends Command {
 		super(parent);
 		
 		addChild(new Score(this));
+		addChild(new SetScore(this));
 	}
 
 	@Override
@@ -48,7 +49,7 @@ public class PlayerRoot extends Command {
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
 		ArrayList<String> suggestions = new ArrayList<String>();
-		ArrayList<String> playerNames = new ArrayList<String>();
+		TreeSet<String> playerNames = new TreeSet<String>();
 		
 		
 		if (args == null || args.length == 0) {
@@ -57,9 +58,7 @@ public class PlayerRoot extends Command {
 		
 		
 		try {
-			for (SimplePlayer player : DatabaseUtils.getPlayers()) {
-				playerNames.add(player.username);
-			}
+			playerNames = PlayerUtils.getPlayerNames();
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();

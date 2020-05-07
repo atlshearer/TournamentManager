@@ -132,7 +132,7 @@ public class DatabaseUtils {
 	 * @return ArrayList<Team> of teams in tournament
 	 * @throws SQLException
 	 */
-	public static ArrayList<Team> getTeamsInTournament(int tournamentID) throws SQLException {
+	public static ArrayList<Team> getTeams(Tournament tournament) throws SQLException {
 		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 		
 		String requestStr = String.format(
@@ -140,7 +140,7 @@ public class DatabaseUtils {
 				"JOIN %1$stournament_team ON %1$stournament_team.team_id = %1$steam.id " +
 				"WHERE %1$stournament_team.tournament_id = %2$d", 
 				prefix,
-				tournamentID);
+				tournament.id);
 		
 		ArrayList<Team> teams = new ArrayList<Team>();
 		
@@ -287,6 +287,22 @@ public class DatabaseUtils {
 		
 		String requestStr = String.format(
 				"INSERT INTO %1$steam_member (player_uuid, team_id) VALUE ('%2$s', %3$s);", 
+				prefix,
+				player.uuid,
+				team.id);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		DatabaseUtils.database.update(requestStr);
+	}
+	
+	public static void removePlayerFromTeam(SimplePlayer player, Team team) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"DELETE FROM %1$steam_member " + 
+				"WHERE %1$steam_member.player_uuid = '%2$s' " + 
+				"AND %1$steam_member.team_id = %3$d;", 
 				prefix,
 				player.uuid,
 				team.id);
@@ -674,5 +690,72 @@ public class DatabaseUtils {
 		results.getStatement().close();
 		
 		return players;
+	}
+	
+	/**
+	 * Checks if the given player is in any team
+	 * 
+	 * @param uuid
+	 * @return Team - A team that the player is in or null if they are in no team
+	 * @throws SQLException
+	 */
+	public static Team isPlayerInAnyTeam(String uuid) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " + 
+				"JOIN %1$steam_member ON %1$steam_member.team_id = %1$steam.id " + 
+				"WHERE %1$steam_member.player_uuid = '%2$s'", 
+				prefix,
+				uuid);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		Team team = null;
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		if (results.next()) {
+			team = new Team(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.getStatement().close();
+		
+		return team;
+	}
+	
+	/**
+	 * Checks if the given player is in the given team
+	 * 
+	 * @param uuid String
+	 * @param team Team
+	 * @return Team - A team that the player is in or null if they are in no team
+	 * @throws SQLException
+	 */
+	public static Team isPlayerInTeam(String uuid, String teamName) throws SQLException {
+		String prefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
+		
+		String requestStr = String.format(
+				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " + 
+				"JOIN %1$steam_member ON %1$steam_member.team_id = %1$steam.id " + 
+				"WHERE %1$steam_member.player_uuid = '%2$s' " +
+				"AND %1$steam.name = '%3$s';", 
+				prefix,
+				uuid,
+				teamName);
+		
+		DatabaseUtils.plugin.getLogger().info(requestStr);
+		
+		Team team = null;
+		
+		ResultSet results = DatabaseUtils.database.query(requestStr);
+		
+		if (results.next()) {
+			team = new Team(results.getInt("id"), results.getString("name"));
+		}
+		
+		results.getStatement().close();
+		
+		return team;
 	}
 }

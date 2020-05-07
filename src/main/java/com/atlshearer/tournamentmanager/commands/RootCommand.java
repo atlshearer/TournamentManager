@@ -23,12 +23,14 @@ public class RootCommand extends Command {
 		addChild(new PlayerRoot(this));
 		addChild(new TeamRoot(this));
 		addChild(new TournamentRoot(this));
+		addChild(new LeaderboardRoot(this));
 		
 		addChild(new ListPlayers(this));
 		addChild(new ListTeams(this));
 		addChild(new ListTournament(this));
+
+		addChild(new AddPlayer(this));
 		
-		addChild(new LeaderboardRoot(this));
 	}
 	
 	@Override

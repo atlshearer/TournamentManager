@@ -11,11 +11,11 @@ import com.atlshearer.tournamentmanager.listeners.SurvivalGamesListeners;
 import com.atlshearer.tournamentmanager.listeners.TNTRunListeners;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
+import com.atlshearer.tournamentmanager.utils.PlayerUtils;
 
 import pro.husk.mysql.MySQL;
 
 public class TournamentManager extends JavaPlugin {
-	public CommandHandler commandHandler;
 	public Command rootCommand;
 	public MySQL database;
 	
@@ -29,15 +29,12 @@ public class TournamentManager extends JavaPlugin {
 		
 		// Enable database
 		DatabaseUtils.onEnable(this);
+		PlayerUtils.onEnable(this);
 		// TODO remove this statement
 		this.database = DatabaseUtils.database;
 		
 		// Enable command handling
-		commandHandler = new CommandHandler(this);
 		rootCommand = new RootCommand();
-		
-		//getCommand("tournamentmanager").setExecutor(commandHandler);
-		//getCommand("tournamentmanager").setTabCompleter(commandHandler);
 		
 		getCommand("tournamentmanager").setExecutor(rootCommand);
 		getCommand("tournamentmanager").setTabCompleter(rootCommand);
