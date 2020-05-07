@@ -8,10 +8,10 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.InvalidCommandNameException;
 import com.atlshearer.tournamentmanager.tournament.Team;
+import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 
 public class TeamRoot extends Command {
 

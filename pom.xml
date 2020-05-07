@@ -15,7 +15,12 @@
 
 		<repository>
 			<id>Survival-Games</id>
-			<url>https://github.com/atlshearer/Survival-Games</url>
+			<url>file://D:/coding/minecraft/Survival-Games</url>
+		</repository>
+		
+		<repository>
+			<id>TNTRun</id>
+			<url>file://D:/coding/minecraft/referencelibs/repo</url>
 		</repository>
 
 		<repository>
@@ -114,6 +119,12 @@
 			<groupId>pro.husk</groupId>
 			<artifactId>mysql</artifactId>
 			<version>1.3.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>tntrun</artifactId>
+			<version>1.0</version>
 		</dependency>
 	</dependencies>
 

@@ -6,8 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
+import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 
 public class AddPlayer implements SubCommand {
 	

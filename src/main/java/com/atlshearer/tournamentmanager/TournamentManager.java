@@ -10,6 +10,7 @@ import com.atlshearer.tournamentmanager.listeners.LogoutEvent;
 import com.atlshearer.tournamentmanager.listeners.SurvivalGamesListeners;
 import com.atlshearer.tournamentmanager.listeners.TNTRunListeners;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
+import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 
 import pro.husk.mysql.MySQL;
 

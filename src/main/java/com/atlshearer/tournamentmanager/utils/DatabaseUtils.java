@@ -1,4 +1,4 @@
-package com.atlshearer.tournamentmanager;
+package com.atlshearer.tournamentmanager.utils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
 
+import com.atlshearer.tournamentmanager.TournamentManager;
 import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 import com.atlshearer.tournamentmanager.tournament.Team;
 import com.atlshearer.tournamentmanager.tournament.Tournament;

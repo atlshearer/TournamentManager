@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
 import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
+import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 
 public class SetPlayerScore implements SubCommand {
 	

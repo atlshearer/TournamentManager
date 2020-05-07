@@ -8,8 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import com.atlshearer.tournamentmanager.DatabaseUtils;
 import com.atlshearer.tournamentmanager.TournamentManager;
+import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 import com.thundergemios10.survivalgames.Game;
 import com.thundergemios10.survivalgames.api.PlayerJoinArenaEvent;
 import com.thundergemios10.survivalgames.api.PlayerKilledEvent;
