@@ -32,7 +32,8 @@ public class TournamentRoot extends Command {
 		}
 		
 		if (args.length == 1) {
-			// TODO redirect to info			
+			// TODO redirect to info
+			return;
 		}
 		
 		try {				
