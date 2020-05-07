@@ -20,7 +20,6 @@ public class ListTournament extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args.length != 0) {
 			sender.sendMessage(ChatColor.RED + getHelp());
 			return;
@@ -29,19 +28,19 @@ public class ListTournament extends Command {
 		try {
 			ArrayList<Tournament> tournaments = DatabaseUtils.getTournaments();
 			
-			if (tournaments.size() == 0) {
+			if (tournaments.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No tournaments found....");
-			} else {
-				sender.sendMessage(ChatColor.BOLD + "Tournament Name" + ChatColor.ITALIC + " (Tournament ID)");
-				for (Tournament tournament : tournaments) {
-					sender.sendMessage(String.format("%s (%d)", tournament.name, tournament.id));
-				}
+				return;
+			} 
+			
+			sender.sendMessage(ChatColor.BOLD + "Tournament Name" + ChatColor.ITALIC + " (Tournament ID)");
+			for (Tournament tournament : tournaments) {
+				sender.sendMessage(String.format("%s (%d)", tournament.name, tournament.id));
 			}
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override

@@ -58,7 +58,7 @@ public class Info extends Command {
 				sender.sendMessage("Team Score: " + team.score);
 			}
 			
-			if (players != null && players.size() != 0) {
+			if (players != null && !players.isEmpty()) {
 				sender.sendMessage(ChatColor.ITALIC + "Players" + (team.score == null ? "" : " - score"));
 				for (SimplePlayer player : players) {
 					if (player.score != null) {

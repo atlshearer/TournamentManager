@@ -45,7 +45,6 @@ public class Leave extends Command {
 			DatabaseUtils.removePlayerFromTeam(new SimplePlayer(player), team);
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully left team '" + team.name + "'.");
-			
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();

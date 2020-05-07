@@ -19,7 +19,6 @@ public class Score extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-
 		if (args.length != 0) {
 			sender.sendMessage(ChatColor.RED + getHelp());
 			return;
@@ -40,13 +39,11 @@ public class Score extends Command {
 			
 			int score = DatabaseUtils.getPlayerScore(plugin.getCurrentTournament(), player.uuid);
 			
-			sender.sendMessage(String.format("%s - " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "%d", 
-					player.username, score));
+			sender.sendMessage(String.format("%s - §d§l%d points", player.username, score));
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override

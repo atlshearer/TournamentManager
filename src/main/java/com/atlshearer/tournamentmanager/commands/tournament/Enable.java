@@ -19,9 +19,8 @@ public class Enable extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args.length != 0) {
-			sender.sendMessage(ChatColor.GREEN + getHelp());
+			sender.sendMessage(ChatColor.RED + getHelp());
 			return;
 		}
 		

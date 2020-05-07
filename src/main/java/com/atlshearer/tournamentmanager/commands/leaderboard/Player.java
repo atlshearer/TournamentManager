@@ -34,7 +34,7 @@ public class Player extends Command {
 			ArrayList<SimplePlayer> players = 
 					DatabaseUtils.getPlayers(plugin.getCurrentTournament());
 			
-			if (players.size() == 0) {
+			if (players.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No players found...");
 				return;
 			}

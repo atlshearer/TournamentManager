@@ -21,7 +21,6 @@ public class Join extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args.length != 0) {
 			sender.sendMessage(ChatColor.RED + getHelp());
 			return;
@@ -39,9 +38,7 @@ public class Join extends Command {
 			
 			if (playerTeam != null) {
 				sender.sendMessage(ChatColor.RED + "You are already in a team.");
-				sender.sendMessage(String.format(
-						"Use " + ChatColor.BLUE + "/tm team %s leave" + ChatColor.RESET + " to leave", 
-						playerTeam.name));
+				sender.sendMessage(String.format("Use §1/tm team %s leave§r to leave", playerTeam.name));
 				return;
 			}
 			

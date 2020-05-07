@@ -19,7 +19,6 @@ public class SetScore extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args.length != 1 || (args.length == 1 && args[0].compareToIgnoreCase("help") == 0)) {
 			sender.sendMessage(ChatColor.RED + getHelp());
 			return;

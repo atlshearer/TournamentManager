@@ -15,7 +15,6 @@ public class ListPlayers extends Command {
 
 	public ListPlayers(Command parent) {
 		super(parent);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -29,20 +28,20 @@ public class ListPlayers extends Command {
 		try {
 			ArrayList<SimplePlayer> players = DatabaseUtils.getPlayers();
 			
-			if (players.size() == 0) {
+			if (players.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No players found....");
-			} else {
-				sender.sendMessage(ChatColor.BOLD + "Player Name");
-				for (SimplePlayer simplePlayer : players) {
-					sender.sendMessage(simplePlayer.username);
-				}
+				return;
+			}
+			
+			sender.sendMessage(ChatColor.BOLD + "Player Name");
+			for (SimplePlayer simplePlayer : players) {
+				sender.sendMessage(simplePlayer.username);
 			}
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
 		
-
 	}
 
 	@Override

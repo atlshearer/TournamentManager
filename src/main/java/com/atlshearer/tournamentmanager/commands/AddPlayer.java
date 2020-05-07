@@ -51,16 +51,16 @@ public class AddPlayer extends Command {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
-		ArrayList<String> suggestions = new ArrayList<String>();
-		TreeSet<String> playerNames = new TreeSet<String>();
+		ArrayList<String> suggestions = new ArrayList<>();
+		TreeSet<String> playerNames = new TreeSet<>();
 		
 		if (args == null || args.length == 0) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 		
 		try {
 			playerNames = PlayerUtils.getPlayersNamesNotInDB();
-		}catch (SQLException e) {
+		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}

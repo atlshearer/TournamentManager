@@ -22,7 +22,6 @@ public class AddPlayer extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args.length != 1) {
 			sender.sendMessage(ChatColor.RED + getHelp());
 			return;
@@ -50,18 +49,16 @@ public class AddPlayer extends Command {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
 		}
-		
 	}
 	
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
-		ArrayList<String> suggestions = new ArrayList<String>();
-		ArrayList<String> playerNames = new ArrayList<String>();
-		
+		ArrayList<String> suggestions = new ArrayList<>();
+		ArrayList<String> playerNames = new ArrayList<>();
 		
 		if (args == null || args.length == 0) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 		
 		

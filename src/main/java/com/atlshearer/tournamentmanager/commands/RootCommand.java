@@ -38,12 +38,13 @@ public class RootCommand extends Command {
 		if (args == null || args.length == 0) {
 			sender.sendMessage("Version " + this.plugin.getDescription().getVersion() + " by Happy3");
 			sender.sendMessage("Type /tm help for command information");
-		} else {
-			try {
-				passToChild(sender, command, label, args, new ArrayList<String>());
-			} catch (InvalidCommandNameException e) {
-				sender.sendMessage(ChatColor.RED + args[0] + " is not a valid sub-command of /" + label);
-			}
+			return true;
+		}
+		
+		try {
+			passToChild(sender, command, label, args, new ArrayList<String>());
+		} catch (InvalidCommandNameException e) {
+			sender.sendMessage(ChatColor.RED + args[0] + " is not a valid sub-command of /" + label);
 		}
 		
 		return true;
@@ -52,7 +53,6 @@ public class RootCommand extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("If you see this error please report to developer. " + getName());
 	}
 	

@@ -26,33 +26,34 @@ public class TournamentRoot extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args == null || args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
-			sender.sendMessage(ChatColor.GREEN + "Usage - /tm tournament <tournamen_name> ...");
-		} else if (args.length == 1) {
-			// Only tournament name is entered
-			sender.sendMessage("Tournament name: " + args[0]);
-		} else {
-			try {				
-				String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
-				pargs.add(args[0]);
-				
-				passToChild(sender, command, label, newArgs, pargs);
-			} catch (InvalidCommandNameException e) {
-				sender.sendMessage(ChatColor.RED + args[1] + " is not a valid sub-command of /" + label);
-			}
+			sender.sendMessage(ChatColor.RED + getHelp());
+			return;
+		}
+		
+		if (args.length == 1) {
+			// TODO redirect to info			
+		}
+		
+		try {				
+			String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
+			pargs.add(args[0]);
+			
+			passToChild(sender, command, label, newArgs, pargs);
+		} catch (InvalidCommandNameException e) {
+			sender.sendMessage(ChatColor.RED + args[1] + " is not a valid sub-command of /" + label);
 		}
 	}
 	
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
-		ArrayList<String> suggestions = new ArrayList<String>();
-		ArrayList<String> tournamentNames = new ArrayList<String>();
+		ArrayList<String> suggestions = new ArrayList<>();
+		ArrayList<String> tournamentNames = new ArrayList<>();
 		
 		
 		if (args == null || args.length == 0) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 		
 		
@@ -83,6 +84,11 @@ public class TournamentRoot extends Command {
 	@Override
 	public String getName() {
 		return "tournament";
+	}
+	
+	@Override
+	public String getHelp() {
+		return "Usage - /tm tournament <tournamen_name> ...";
 	}
 
 	@Override

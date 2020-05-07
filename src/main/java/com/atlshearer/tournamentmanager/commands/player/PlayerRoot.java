@@ -25,35 +25,35 @@ public class PlayerRoot extends Command {
 	@Override
 	public void onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
 			List<String> pargs) {
-		
 		if (args == null || args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("help"))) {
 			sender.sendMessage(ChatColor.GREEN + getHelp());
-		} else if (args.length == 1) {
+			return;
+		}
+		
+		if (args.length == 1) {
+			pargs.add(args[0]);
+			// TODO add info command for player and re-route
+			return;
+		}
+		
+		try {				
+			String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
 			pargs.add(args[0]);
 			
-			//children.get("info").onCommand(sender, command, label, new String[0], pargs);
-		} else {
-			try {				
-				String[] newArgs = Arrays.copyOfRange(args, 1, args.length);
-				pargs.add(args[0]);
-				
-				passToChild(sender, command, label, newArgs, pargs);
-			} catch (InvalidCommandNameException e) {
-				sender.sendMessage(ChatColor.RED + args[1] + " is not a valid sub-command of /" + label);
-			}
-
+			passToChild(sender, command, label, newArgs, pargs);
+		} catch (InvalidCommandNameException e) {
+			sender.sendMessage(ChatColor.RED + args[1] + " is not a valid sub-command of /" + label);
 		}
 	}
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias,
 			String[] args) {
-		ArrayList<String> suggestions = new ArrayList<String>();
-		TreeSet<String> playerNames = new TreeSet<String>();
-		
+		ArrayList<String> suggestions = new ArrayList<>();
+		TreeSet<String> playerNames = new TreeSet<>();
 		
 		if (args == null || args.length == 0) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 		
 		
