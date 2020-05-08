@@ -6,7 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.atlshearer.tournamentmanager.TournamentManager;
-import com.atlshearer.tournamentmanager.tournament.Team;
 
 public class LogoutEvent implements Listener {
 
