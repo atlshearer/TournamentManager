@@ -28,8 +28,8 @@ public class AddPlayer extends Command {
 		}
 		
 		try {
-			Team team = DatabaseUtils.getTeamByName(pargs.get(0));
-			SimplePlayer player = DatabaseUtils.getPlayerByName(args[0]);
+			Team team = DatabaseUtils.TeamUtils.getTeamByName(pargs.get(0));
+			SimplePlayer player = DatabaseUtils.PlayerUtils.getPlayerByName(args[0]);
 			
 			if (team == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No team by the name %s was found.", pargs.get(0)));
@@ -41,7 +41,7 @@ public class AddPlayer extends Command {
 				return;
 			}
 			
-			DatabaseUtils.addPlayerToTeam(player, team);
+			DatabaseUtils.TeamUtils.addPlayerToTeam(player, team);
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully added player to team.");
 			
@@ -62,13 +62,8 @@ public class AddPlayer extends Command {
 		}
 		
 		
-		try {
-			for (SimplePlayer player : DatabaseUtils.getPlayers()) {
-				playerNames.add(player.username);
-			}
-		} catch (SQLException e) {
-			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
-			e.printStackTrace();
+		for (SimplePlayer player : DatabaseUtils.PlayerUtils.getPlayers()) {
+			playerNames.add(player.username);
 		}
 		
 		

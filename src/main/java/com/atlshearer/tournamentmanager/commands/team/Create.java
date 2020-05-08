@@ -29,12 +29,12 @@ public class Create extends Command {
 		}
 		
 		try {
-			if (DatabaseUtils.getTeamByName(pargs.get(0)) != null) {
+			if (DatabaseUtils.TeamUtils.getTeamByName(pargs.get(0)) != null) {
 				sender.sendMessage(ChatColor.RED + String.format("Team with the name '%s' already exists.", pargs.get(0)));
 				return;
 			}
 
-			DatabaseUtils.createTeam(pargs.get(0));
+			DatabaseUtils.TeamUtils.createTeam(pargs.get(0));
 			sender.sendMessage(ChatColor.GREEN + "Successfully added team to db.");
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");

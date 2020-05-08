@@ -56,14 +56,7 @@ public class PlayerRoot extends Command {
 			return new ArrayList<>();
 		}
 		
-		
-		try {
-			playerNames = PlayerUtils.getPlayerNames();
-		} catch (SQLException e) {
-			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
-			e.printStackTrace();
-		}
-		
+		playerNames = PlayerUtils.getPlayerNames();
 		
 		if (playerNames.contains(args[0])) {
 			return super.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));

@@ -23,7 +23,7 @@ public class ListTeams extends Command {
 			return;
 		}
 		
-		List<Team> teams = DatabaseUtils.getTeams();
+		List<Team> teams = DatabaseUtils.TeamUtils.getTeams();
 		
 		if (teams.isEmpty()) {
 			sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No teams found....");

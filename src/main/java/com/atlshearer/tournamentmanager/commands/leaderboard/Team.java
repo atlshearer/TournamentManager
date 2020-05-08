@@ -30,7 +30,7 @@ public class Team extends Command {
 				
 		try {
 			List<com.atlshearer.tournamentmanager.tournament.Team> teams = 
-					DatabaseUtils.getTeamScores(plugin.getCurrentTournament());
+					DatabaseUtils.TeamUtils.getTeamScores(plugin.getCurrentTournament());
 			
 			if (teams.isEmpty()) {
 				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No teams found...");

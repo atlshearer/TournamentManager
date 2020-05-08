@@ -62,7 +62,7 @@ public class TeamRoot extends Command {
 		}
 		
 		
-		List<Team> teams = DatabaseUtils.getTeams();
+		List<Team> teams = DatabaseUtils.TeamUtils.getTeams();
 		for (Team team : teams) {
 			teamNames.add(team.name);
 		}

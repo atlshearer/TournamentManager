@@ -35,14 +35,14 @@ public class Leave extends Command {
 		try {
 			Player player = (Player) sender;
 			
-			Team team = DatabaseUtils.isPlayerInTeam(player.getUniqueId().toString(), pargs.get(0));
+			Team team = DatabaseUtils.PlayerUtils.isPlayerInTeam(player.getUniqueId().toString(), pargs.get(0));
 			
 			if (team == null) {
 				sender.sendMessage(ChatColor.RED + "You are not in that team or that team does not exist");
 				return;
 			}
 			
-			DatabaseUtils.removePlayerFromTeam(new SimplePlayer(player), team);
+			DatabaseUtils.TeamUtils.removePlayerFromTeam(new SimplePlayer(player), team);
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully left team '" + team.name + "'.");
 		} catch (SQLException e) {

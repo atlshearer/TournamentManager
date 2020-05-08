@@ -24,23 +24,17 @@ public class ListPlayers extends Command {
 			return;
 		}
 		
-		try {
-			List<SimplePlayer> players = DatabaseUtils.getPlayers();
-			
-			if (players.isEmpty()) {
-				sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No players found....");
-				return;
-			}
-			
-			sender.sendMessage(ChatColor.BOLD + "Player Name");
-			for (SimplePlayer simplePlayer : players) {
-				sender.sendMessage(simplePlayer.username);
-			}
-		} catch (SQLException e) {
-			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
-			e.printStackTrace();
+		List<SimplePlayer> players = DatabaseUtils.PlayerUtils.getPlayers();
+		
+		if (players.isEmpty()) {
+			sender.sendMessage(ChatColor.RED + "Warning:" + ChatColor.RESET + " No players found....");
+			return;
 		}
 		
+		sender.sendMessage(ChatColor.BOLD + "Player Name");
+		for (SimplePlayer simplePlayer : players) {
+			sender.sendMessage(simplePlayer.username);
+		}
 	}
 
 	@Override

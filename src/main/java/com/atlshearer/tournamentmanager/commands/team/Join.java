@@ -34,7 +34,7 @@ public class Join extends Command {
 		try {
 			Player player = (Player) sender;
 			
-			Team playerTeam = DatabaseUtils.isPlayerInAnyTeam(player.getUniqueId().toString());
+			Team playerTeam = DatabaseUtils.PlayerUtils.isPlayerInAnyTeam(player.getUniqueId().toString());
 			
 			if (playerTeam != null) {
 				sender.sendMessage(ChatColor.RED + "You are already in a team.");
@@ -42,14 +42,14 @@ public class Join extends Command {
 				return;
 			}
 			
-			Team team = DatabaseUtils.getTeamByName(pargs.get(0));
+			Team team = DatabaseUtils.TeamUtils.getTeamByName(pargs.get(0));
 			
 			if (team == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No team by the name %s was found.", pargs.get(0)));
 				return;
 			}
 			
-			DatabaseUtils.addPlayerToTeam(new SimplePlayer(player), team);
+			DatabaseUtils.TeamUtils.addPlayerToTeam(new SimplePlayer(player), team);
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully joined '" + team.name + "'.");
 			

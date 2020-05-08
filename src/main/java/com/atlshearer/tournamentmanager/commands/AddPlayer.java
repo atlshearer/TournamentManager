@@ -36,7 +36,7 @@ public class AddPlayer extends Command {
 		}
 		
 		try {
-			DatabaseUtils.addPlayer(target);
+			DatabaseUtils.PlayerUtils.addPlayer(target);
 			
 			sender.sendMessage(ChatColor.GREEN + target.getName() + " added to database successfully.");
 		} catch (MySQLIntegrityConstraintViolationException e) {
@@ -58,12 +58,7 @@ public class AddPlayer extends Command {
 			return new ArrayList<>();
 		}
 		
-		try {
-			playerNames = PlayerUtils.getPlayersNamesNotInDB();
-		} catch (SQLException e) {
-			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
-			e.printStackTrace();
-		}
+		playerNames = PlayerUtils.getPlayersNamesNotInDB();
 		
 		for (String name : playerNames) {
 			if (name.toLowerCase().startsWith(args[0].toLowerCase())) {

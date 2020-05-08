@@ -25,7 +25,7 @@ public class Enable extends Command {
 		}
 		
 		try {
-			Tournament tournament = DatabaseUtils.getTournamentByName(pargs.get(0));
+			Tournament tournament = DatabaseUtils.TournamentUtils.getTournamentByName(pargs.get(0));
 			
 			if (tournament == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No tournament by the name %s was found", pargs.get(0)));

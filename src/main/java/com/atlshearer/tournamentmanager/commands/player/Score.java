@@ -30,14 +30,14 @@ public class Score extends Command {
 		}
 		
 		try {
-			SimplePlayer player = DatabaseUtils.getPlayerByName(pargs.get(0));
+			SimplePlayer player = DatabaseUtils.PlayerUtils.getPlayerByName(pargs.get(0));
 			
 			if (player == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No player by the name %s was found.", args[0]));
 				return;
 			}
 			
-			int score = DatabaseUtils.getPlayerScore(plugin.getCurrentTournament(), player.uuid);
+			int score = DatabaseUtils.PlayerUtils.getPlayerScore(plugin.getCurrentTournament(), player.uuid);
 			
 			sender.sendMessage(String.format("%s - §d§l%d points", player.username, score));
 		} catch (SQLException e) {

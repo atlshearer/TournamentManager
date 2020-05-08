@@ -29,12 +29,12 @@ public class Create extends Command {
 		}
 
 		try {
-			if (DatabaseUtils.getTournamentByName(pargs.get(0)) != null) {
+			if (DatabaseUtils.TournamentUtils.getTournamentByName(pargs.get(0)) != null) {
 				sender.sendMessage(ChatColor.RED + String.format("Tournament with the name '%s' already exists.", pargs.get(0)));
 				return;
 			}
 			
-			DatabaseUtils.createTournament(pargs.get(0));
+			DatabaseUtils.TournamentUtils.createTournament(pargs.get(0));
 			sender.sendMessage(ChatColor.GREEN + "Succesfully added tournament to db.");
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");

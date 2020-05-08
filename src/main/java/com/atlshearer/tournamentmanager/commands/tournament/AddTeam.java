@@ -27,8 +27,8 @@ public class AddTeam extends Command {
 		}
 		
 		try {
-			Tournament tournament = DatabaseUtils.getTournamentByName(pargs.get(0));
-			Team team = DatabaseUtils.getTeamByName(args[0]);
+			Tournament tournament = DatabaseUtils.TournamentUtils.getTournamentByName(pargs.get(0));
+			Team team = DatabaseUtils.TeamUtils.getTeamByName(args[0]);
 			
 			if (tournament == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No tournament by the name %s was found.", pargs.get(0)));
@@ -40,7 +40,7 @@ public class AddTeam extends Command {
 				return;
 			}
 			
-			DatabaseUtils.addTeamToTournament(tournament, team);
+			DatabaseUtils.TournamentUtils.addTeamToTournament(tournament, team);
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully added team to tournament.");
 		} catch (SQLException e) {
@@ -62,7 +62,7 @@ public class AddTeam extends Command {
 		
 		
 		//try {
-			for (Team team : DatabaseUtils.getTeams()) {
+			for (Team team : DatabaseUtils.TeamUtils.getTeams()) {
 				teamNames.add(team.name);
 			}
 		/*} catch (SQLException e) {

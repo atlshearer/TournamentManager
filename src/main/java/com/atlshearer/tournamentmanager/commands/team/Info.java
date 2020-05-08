@@ -27,12 +27,12 @@ public class Info extends Command {
 		try {
 			Team team = null;
 			if (plugin.isTournamentEnabled()) {
-				team = DatabaseUtils.getTeamByName(pargs.get(0), plugin.getCurrentTournament());
+				team = DatabaseUtils.TeamUtils.getTeamByName(pargs.get(0), plugin.getCurrentTournament());
 			} 
 			
 			if (team == null) {
 				// A team with no score will not be found by previous request
-				team = DatabaseUtils.getTeamByName(pargs.get(0));				
+				team = DatabaseUtils.TeamUtils.getTeamByName(pargs.get(0));				
 			}
 			
 			if (team == null) {
@@ -43,11 +43,11 @@ public class Info extends Command {
 			List<SimplePlayer> players = null;
 			
 			if (plugin.isTournamentEnabled() && team.score != null) {
-				players = DatabaseUtils.getPlayersInTeam(team.id, plugin.getCurrentTournament());
+				players = DatabaseUtils.PlayerUtils.getPlayersInTeam(team.id, plugin.getCurrentTournament());
 			}
 			
 			if (players == null) {
-				players = DatabaseUtils.getPlayersInTeam(team.id);
+				players = DatabaseUtils.PlayerUtils.getPlayersInTeam(team.id);
 			}
 			
 			sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "TEAM INFO");

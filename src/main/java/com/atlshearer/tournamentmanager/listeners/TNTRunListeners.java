@@ -37,7 +37,7 @@ public class TNTRunListeners implements Listener {
 					@Override
 					public void run() {
 						try {
-							DatabaseUtils.addToPlayerScore(plugin.getCurrentTournament(), player.getUniqueId().toString(), 1);
+							DatabaseUtils.PlayerUtils.addToPlayerScore(plugin.getCurrentTournament(), player.getUniqueId().toString(), 1);
 						} catch (SQLException e) {
 							Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
 							e.printStackTrace();
@@ -61,7 +61,7 @@ public class TNTRunListeners implements Listener {
 				@Override
 				public void run() {
 					try {
-						DatabaseUtils.addToPlayerScore(plugin.getCurrentTournament(), player.getUniqueId().toString(), 10);
+						DatabaseUtils.PlayerUtils.addToPlayerScore(plugin.getCurrentTournament(), player.getUniqueId().toString(), 10);
 					} catch (SQLException e) {
 						Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
 						e.printStackTrace();

@@ -30,14 +30,14 @@ public class SetScore extends Command {
 		}
 		
 		try {
-			SimplePlayer player = DatabaseUtils.getPlayerByName(pargs.get(0));
+			SimplePlayer player = DatabaseUtils.PlayerUtils.getPlayerByName(pargs.get(0));
 			
 			if (player == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No player by the name %s was found.", args[0]));
 				return;
 			}
 			
-			DatabaseUtils.setPlayerScore(plugin.getCurrentTournament(), player.uuid, Integer.parseInt(args[0]));
+			DatabaseUtils.PlayerUtils.setPlayerScore(plugin.getCurrentTournament(), player.uuid, Integer.parseInt(args[0]));
 			
 			sender.sendMessage(ChatColor.GREEN + player.username + "'s score has been set to " + args[0]);
 		} catch (SQLException e) {
