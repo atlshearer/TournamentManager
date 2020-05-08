@@ -20,6 +20,7 @@ public class AdaptorRoot extends Command {
 		addChild(new Enable(this));
 		addChild(new StartGame(this));
 		addChild(new State(this));
+		addChild(new SetAsNext(this));
 	}
 	
 	@Override

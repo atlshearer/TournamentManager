@@ -36,8 +36,8 @@ public class JoinNext extends Command {
 			return;
 		}
 		
-		adaptor.playerJoin(player);
 		sender.sendMessage(ChatColor.GREEN + "Joining game.");
+		adaptor.playerJoin(player);
 	}
 
 	@Override
