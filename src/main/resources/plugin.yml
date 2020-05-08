@@ -5,7 +5,7 @@ api-version: 1.15
 author: atlshearer
 description: An Example plugin
 
-depend: [SurvivalGames, TNTRun_reloaded]
+depend: [TNTRun_reloaded]
 
 commands:
     tournamentmanager:

@@ -6,9 +6,11 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.atlshearer.tournamentmanager.commands.adaptor.AdaptorRoot;
 import com.atlshearer.tournamentmanager.commands.leaderboard.LeaderboardRoot;
 import com.atlshearer.tournamentmanager.commands.player.ListPlayers;
 import com.atlshearer.tournamentmanager.commands.player.PlayerRoot;
+import com.atlshearer.tournamentmanager.commands.team.Join;
 import com.atlshearer.tournamentmanager.commands.team.ListTeams;
 import com.atlshearer.tournamentmanager.commands.team.TeamRoot;
 import com.atlshearer.tournamentmanager.commands.tournament.ListTournament;
@@ -24,12 +26,15 @@ public class RootCommand extends Command {
 		addChild(new TeamRoot(this));
 		addChild(new TournamentRoot(this));
 		addChild(new LeaderboardRoot(this));
+		addChild(new AdaptorRoot(this));
 		
 		addChild(new ListPlayers(this));
 		addChild(new ListTeams(this));
 		addChild(new ListTournament(this));
 
+		// Leaf nodes
 		addChild(new AddPlayer(this));
+		addChild(new JoinNext(this));
 		
 	}
 	
