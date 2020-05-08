@@ -61,14 +61,14 @@ public class AddTeam extends Command {
 		}
 		
 		
-		try {
+		//try {
 			for (Team team : DatabaseUtils.getTeams()) {
 				teamNames.add(team.name);
 			}
-		} catch (SQLException e) {
+		/*} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 		for (String team : teamNames) {

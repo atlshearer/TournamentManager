@@ -3,14 +3,19 @@ package com.atlshearer.tournamentmanager.utils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.atlshearer.tournamentmanager.TournamentManager;
 import com.atlshearer.tournamentmanager.tournament.SimplePlayer;
 import com.atlshearer.tournamentmanager.tournament.Team;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import pro.husk.mysql.MySQL;
 
@@ -39,29 +44,29 @@ public class DatabaseUtils {
 		try {
 			tablePrefix = DatabaseUtils.plugin.getConfig().getString("data.table_prefix");
 
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "player ("+
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "player ("+
 							"uuid VARCHAR(36) NOT NULL," + 
 							"username VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (uuid));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team (" +
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team (" +
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY (id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team_member (" +
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "team_member (" +
 							"player_uuid VARCHAR(36) NOT NULL REFERENCES player(uuid)," +
 							"team_id INT NOT NULL REFERENCES team(id)," +
 							"CONSTRAINT team_member_pkey PRIMARY KEY (player_uuid, team_id)," +
 							"FOREIGN KEY(player_uuid) REFERENCES " + tablePrefix + "player(uuid)," +
 							"FOREIGN KEY(team_id)     REFERENCES " + tablePrefix + "team(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament (" + 
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament (" + 
 							"id INT NOT NULL AUTO_INCREMENT," + 
 							"name VARCHAR(16) NOT NULL," + 
 							"PRIMARY KEY(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "score (" + 
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "score (" + 
 							"tournament_id INT NOT NULL," + 
 							"player_uuid VARCHAR(36) NOT NULL," + 
 							"score INT NOT NULL," + 
@@ -69,14 +74,14 @@ public class DatabaseUtils {
 							"FOREIGN KEY(player_uuid)   REFERENCES " + tablePrefix + "player(uuid)," + 
 							"FOREIGN KEY(tournament_id) REFERENCES " + tablePrefix + "tournament(id));");
 			
-			database.update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament_team (" + 
+			update("CREATE TABLE IF NOT EXISTS " + tablePrefix + "tournament_team (" + 
 							"tournament_id INT NOT NULL," + 
 							"team_id INT NOT NULL," + 
 							"CONSTRAINT tournament_team_pkey PRIMARY KEY (tournament_id, team_id)," +
 							"FOREIGN KEY(tournament_id) REFERENCES " + tablePrefix + "tournament(id)," +
 							"FOREIGN KEY(team_id)       REFERENCES " + tablePrefix + "team(id));");
 			
-			database.update(String.format(
+			update(String.format(
 					"CREATE OR REPLACE VIEW %1$steam_score AS " + 
 					"SELECT %1$sscore.tournament_id, %1$steam.id AS team_id, %1$steam.name AS team_name, SUM(%1$sscore.score) AS score FROM %1$sscore " + 
 					"JOIN %1$steam_member ON %1$steam_member.player_uuid = %1$sscore.player_uuid " + 
@@ -115,7 +120,7 @@ public class DatabaseUtils {
 		return DatabaseUtils.database.query(query);
 	}
 	
-	// Team	
+	// ----- Team -----	
 	public static void createTeam(String name) throws SQLException {
 		String requestStr = String.format(
 				"INSERT INTO %1$steam (name) VALUE ('%2$s');", 
@@ -126,6 +131,32 @@ public class DatabaseUtils {
 	}
 
 	
+	// List<Team> loading	
+	private static CacheLoader<String, List<Team>> teamsLoader = new CacheLoader<String, List<Team>>() {
+		@Override
+		public List<Team> load(String requestStr) {		
+			ArrayList<Team> teams = new ArrayList<>();
+			
+			ResultSet results;
+			try {
+				results = query(requestStr);
+				
+				while(results.next()) {
+					teams.add(new Team(results.getInt("id"), results.getString("name")));
+				}
+			} catch (SQLException e) {
+				plugin.getServer().broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
+				e.printStackTrace();
+			}
+			
+			return teams;
+		}
+	};
+	
+	private static LoadingCache<String, List<Team>> teamsCahce = CacheBuilder.newBuilder()
+			.expireAfterWrite(5, TimeUnit.SECONDS)
+			.build(teamsLoader);
+	
 	/**
 	 * Gets all teams stored in database
 	 * 
@@ -133,22 +164,12 @@ public class DatabaseUtils {
 	 * @return ArrayList<Team> of all teams
 	 * @throws SQLException 
 	 */
-	public static List<Team> getTeams() throws SQLException {			
+	public static List<Team> getTeams() {
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam;", 
 				tablePrefix);
 		
-		ArrayList<Team> teams = new ArrayList<>();
-		
-		ResultSet results = query(requestStr);
-		
-		while(results.next()) {
-			while(results.next()) {
-				teams.add(new Team(results.getInt("id"), results.getString("name")));
-			}
-		}
-		
-		return teams;
+		return teamsCahce.getUnchecked(requestStr);
 	}
 	
 	/**
@@ -158,7 +179,7 @@ public class DatabaseUtils {
 	 * @return ArrayList<Team> of teams in tournament
 	 * @throws SQLException
 	 */
-	public static List<Team> getTeams(Tournament tournament) throws SQLException {		
+	public static List<Team> getTeams(Tournament tournament){		
 		String requestStr = String.format(
 				"SELECT %1$steam.id, %1$steam.name FROM %1$steam " +
 				"JOIN %1$stournament_team ON %1$stournament_team.team_id = %1$steam.id " +
@@ -166,19 +187,7 @@ public class DatabaseUtils {
 				tablePrefix,
 				tournament.id);
 		
-		ArrayList<Team> teams = new ArrayList<>();
-		
-		ResultSet results = query(requestStr);
-		
-		while(results.next()) {
-			while(results.next()) {
-				teams.add(new Team(results.getInt("id"), results.getString("name")));
-			}
-		}
-		
-		results.close();
-		
-		return teams;
+		return teamsCahce.getUnchecked(requestStr);
 	}
 	
 	public static Team getTeamByID(int teamID) throws SQLException {
@@ -326,22 +335,46 @@ public class DatabaseUtils {
 		update(requestStr);
 	}
 	
-	public static List<Tournament> getTournaments() throws SQLException {
+	
+	private static CacheLoader<String, List<Tournament>> tournamentsLoader = new CacheLoader<String, List<Tournament>>() {
+		@Override
+		public List<Tournament> load(String requestStr) {		
+			ArrayList<Tournament> tournaments = new ArrayList<>();
+			
+			ResultSet results;
+			try {
+				results = query(requestStr);
+				
+				while (results.next()) {
+					tournaments.add(new Tournament(results.getInt("id"), results.getString("name")));
+				}
+				
+				results.getStatement().close();
+			} catch (SQLException e) {
+				plugin.getServer().broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
+				e.printStackTrace();
+			}
+			
+			return tournaments;
+		}
+	};
+	
+	private static LoadingCache<String, List<Tournament>> tournamentsCache = CacheBuilder.newBuilder()
+			.expireAfterWrite(5, TimeUnit.SECONDS)
+			.build(tournamentsLoader);
+	
+	/**
+	 * Retrieves all the tournaments from the database
+	 * 
+	 * @return 
+	 * @throws SQLException
+	 */
+	public static List<Tournament> getTournaments() {
 		String requestStr = String.format(
 				"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament",
 				tablePrefix);
 		
-		ArrayList<Tournament> tournaments = new ArrayList<>();
-		
-		ResultSet results = query(requestStr);
-		
-		while (results.next()) {
-			tournaments.add(new Tournament(results.getInt("id"), results.getString("name")));
-		}
-		
-		results.getStatement().close();
-		
-		return tournaments;
+		return tournamentsCache.getUnchecked(requestStr);
 	}
 	
 	/**
@@ -623,6 +656,32 @@ public class DatabaseUtils {
 		return player;
 	}
 	
+	private static CacheLoader<String, List<SimplePlayer>> playersLoader = new CacheLoader<String, List<SimplePlayer>>() {
+		@Override
+		public List<SimplePlayer> load(String requestStr) {		
+			ArrayList<SimplePlayer> players = new ArrayList<>();
+			
+			try {
+				ResultSet results = query(requestStr);
+				
+				while (results.next()) {
+					players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
+				}
+				
+				results.getStatement().close();
+			} catch (SQLException e) {
+				plugin.getServer().broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
+				e.printStackTrace();
+			}
+			
+			return players;
+		}
+	};
+	
+	private static LoadingCache<String, List<SimplePlayer>> playersCache = CacheBuilder.newBuilder()
+			.expireAfterWrite(5, TimeUnit.SECONDS)
+			.build(playersLoader);
+	
 	/**
 	 * Gets all players in database
 	 * 
@@ -630,22 +689,12 @@ public class DatabaseUtils {
 	 * @return SimplePlayer with data about player or null
 	 * @throws SQLException
 	 */
-	public static List<SimplePlayer> getPlayers() throws SQLException {
+	public static List<SimplePlayer> getPlayers() {
 		String requestStr = String.format(
 				"SELECT %1$splayer.uuid, %1$splayer.username FROM %1$splayer", 
 				tablePrefix);
 		
-		ArrayList<SimplePlayer> players = new ArrayList<>();
-		
-		ResultSet results = query(requestStr);
-		
-		while (results.next()) {
-			players.add(new SimplePlayer(results.getString("uuid"), results.getString("username")));
-		}
-		
-		results.getStatement().close();
-		
-		return players;
+		return playersCache.getUnchecked(requestStr);
 	}
 	
 	/**

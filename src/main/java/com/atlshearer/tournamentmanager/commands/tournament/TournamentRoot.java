@@ -1,6 +1,5 @@
 package com.atlshearer.tournamentmanager.commands.tournament;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,14 +57,9 @@ public class TournamentRoot extends Command {
 		}
 		
 		
-		try {
-			List<Tournament> tournaments = DatabaseUtils.getTournaments();
-			for (Tournament tournament : tournaments) {
-				tournamentNames.add(tournament.name);
-			}
-		} catch (SQLException e) {
-			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
-			e.printStackTrace();
+		List<Tournament> tournaments = DatabaseUtils.getTournaments();
+		for (Tournament tournament : tournaments) {
+			tournamentNames.add(tournament.name);
 		}
 		
 		
