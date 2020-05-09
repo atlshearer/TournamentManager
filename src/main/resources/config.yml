@@ -13,3 +13,9 @@ data:
 
   # The prefix for all TournamentManager SQL tables.
   table_prefix: 'tm_'
+  
+team:
+   # Only applies when players use /tm team <teamname> join
+   maxsize: 2
+  
+debug: false

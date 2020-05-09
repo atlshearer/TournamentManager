@@ -31,8 +31,7 @@ public class DatabaseUtils {
 	public static void onEnable(TournamentManager plugin) {
 		DatabaseUtils.plugin = plugin;
 		
-		// TODO flag...
-		DatabaseUtils.debugOutput = true;
+		DatabaseUtils.debugOutput = DatabaseUtils.plugin.getConfig().getBoolean("debug");
 		
 		DatabaseUtils.database = new MySQL(
 				DatabaseUtils.plugin.getConfig().getString("data.address"), 
@@ -121,7 +120,6 @@ public class DatabaseUtils {
 	}
 	
 	
-	// Static class for all player associated database calls
 	public static class PlayerUtils {
 		
 		private PlayerUtils() {}
@@ -177,6 +175,18 @@ public class DatabaseUtils {
 		}
 		
 		/**
+		 * Sets the score of player for given tournament
+		 * 
+		 * @param tournament
+		 * @param uuid
+		 * @param score
+		 * @throws SQLException
+		 */
+		public static void setPlayerScore(Tournament tournament, SimplePlayer player, int score) throws SQLException {
+			setPlayerScore(tournament, player.uuid, score);
+		}
+		
+		/**
 		 * Adds the given score to the players total
 		 * 
 		 * @param tournament
@@ -226,6 +236,33 @@ public class DatabaseUtils {
 			return score;
 		}
 		
+		
+		/**
+		 * Check if the player is stored in the database
+		 * 
+		 * @param uuid
+		 * @return true iff a record is found
+		 * @throws SQLException
+		 */
+		public static boolean doesPlayerRecordExist(String uuid) throws SQLException {
+			String requestStr = String.format(
+					"SELECT EXISTS( " + 
+					"SELECT 1 FROM %1$splayer " + 
+					"WHERE %1$splayer.uuid = '%2$s')", 
+					tablePrefix,
+					uuid);		
+			
+			ResultSet results = query(requestStr);
+			
+			boolean exists = false;
+			
+			if (results.next()) {
+				exists = results.getInt(1) == 1;
+			}
+			
+			return exists;
+		}
+		
 		/**
 		 * Checks if the player has a score in the given tournament
 		 * 
@@ -253,6 +290,18 @@ public class DatabaseUtils {
 			}
 			
 			return exists;
+		}
+		
+		/**
+		 * Checks if the player has a score in the given tournament
+		 * 
+		 * @param tournament
+		 * @param player
+		 * @return true iff a score record exists
+		 * @throws SQLException
+		 */
+		public static boolean doesPlayerScoreExist(Tournament tournament, SimplePlayer player) throws SQLException {
+			return doesPlayerScoreExist(tournament, player.uuid);
 		}
 		
 		/**
@@ -474,6 +523,13 @@ public class DatabaseUtils {
 					team.id);
 
 			update(requestStr);
+			
+			// Add player score if required
+			for (Tournament tournament : TournamentUtils.getTournaments(team)) {
+				if (!PlayerUtils.doesPlayerScoreExist(tournament, player)) {
+					PlayerUtils.setPlayerScore(tournament, player, 0);
+				}
+			}
 		}
 
 		public static void removePlayerFromTeam(SimplePlayer player, Team team) throws SQLException {
@@ -648,7 +704,6 @@ public class DatabaseUtils {
 		}
 	}
 	
-	
 	public static class TournamentUtils {
 
 		private TournamentUtils() {}
@@ -664,21 +719,21 @@ public class DatabaseUtils {
 		}
 
 		
-		public static void addTeamToTournament(int tournamentID, int teamID) throws SQLException {
+		public static void addTeamToTournament(Tournament tournament, Team team) throws SQLException {
 			String requestStr = String.format(
 					"INSERT INTO %1$stournament_team (team_id, tournament_id) VALUE (%2$d, %3$d);", 
 					tablePrefix,
-					teamID,
-					tournamentID);
+					team.id,
+					tournament.id);
 
 			update(requestStr);
 
-			// Find all players in team
-		}
-
-		
-		public static void addTeamToTournament(Tournament tournament, Team team) throws SQLException {
-			addTeamToTournament(tournament.id, team.id);
+			// Add player score if required
+			for (SimplePlayer player : PlayerUtils.getPlayersInTeam(team.id)) {
+				if (!PlayerUtils.doesPlayerScoreExist(tournament, player)) {
+					PlayerUtils.setPlayerScore(tournament, player, 0);
+				}
+			}
 		}
 		
 		
@@ -797,6 +852,21 @@ public class DatabaseUtils {
 			return tournamentsCache.getUnchecked(requestStr);
 		}
 
-		
+		/**
+		 * Retrieves all the tournaments that a given team is in
+		 * 
+		 * @return 
+		 * @throws SQLException
+		 */
+		public static List<Tournament> getTournaments(Team team) {
+			String requestStr = String.format(
+					"SELECT %1$stournament.id, %1$stournament.name FROM %1$stournament " + 
+					"JOIN %1$stournament_team ON %1$stournament_team.tournament_id = %1$stournament.id " + 
+					"WHERE %1$stournament_team.team_id = %2$d",
+					tablePrefix,
+					team.id);
+
+			return tournamentsCache.getUnchecked(requestStr);
+		}
 	}	
 }

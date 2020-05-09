@@ -32,7 +32,13 @@ public class Join extends Command {
 		}
 		
 		try {
+			sender.sendMessage(ChatColor.GREEN + "Processing...");
+			
 			Player player = (Player) sender;
+			
+			if (!DatabaseUtils.PlayerUtils.doesPlayerRecordExist(player.getUniqueId().toString())) {
+				DatabaseUtils.PlayerUtils.addPlayer(player);
+			}
 			
 			Team playerTeam = DatabaseUtils.PlayerUtils.isPlayerInAnyTeam(player.getUniqueId().toString());
 			
@@ -46,6 +52,13 @@ public class Join extends Command {
 			
 			if (team == null) {
 				sender.sendMessage(ChatColor.RED + String.format("No team by the name %s was found.", pargs.get(0)));
+				return;
+			}
+			
+			List<SimplePlayer> playerInTeam = DatabaseUtils.PlayerUtils.getPlayersInTeam(team.id);
+			
+			if (playerInTeam.size() >= plugin.getConfig().getInt("team.maxsize")) {
+				sender.sendMessage(ChatColor.RED + "Team is already full...");
 				return;
 			}
 			
