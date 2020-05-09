@@ -1,7 +1,9 @@
 package com.atlshearer.tournamentmanager;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -101,27 +103,24 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 		getLogger().info(() -> String.format("Giving player %s %d points as requested by %s", 
 				player.getName(), points, adaptor.getAdaptorName()));
 		
-		// TODO make sure request is async
-		/*
-		if (tournamentManager.isTournamentEnabled()) {
-			Bukkit.getScheduler().runTaskAsynchronously(tournamentManager, new Runnable() {
+		if (isTournamentEnabled()) {
+			getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
 				@Override
 				public void run() {
 					try {
-						DatabaseUtils.addToPlayerScore(tournamentManager.getCurrentTournament(), killer.getUniqueId().toString(), 10);
+						DatabaseUtils.PlayerUtils.addToPlayerScore(getCurrentTournament(), player.getUniqueId().toString(), points);
 
 					} catch (SQLException e) {
-						Bukkit.broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
+						getServer().broadcast(ChatColor.DARK_RED + "An SQL error occured. Please check logs.", "tournamentmanager.admin");
 						e.printStackTrace();
 					}					
 				}
 			});
 			
-			Bukkit.broadcastMessage("Giving player " + killer.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " 10 Points for killing " + p.getDisplayName());
+			getServer().broadcastMessage("Giving player " + player.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " 10 Points");
 		} else {
-			Bukkit.broadcast(ChatColor.RED + "No tournament is enable. No scores being given.", "tournamentmanager.admin");
+			getServer().broadcast(ChatColor.RED + "No tournament is enable. No scores being given.", "tournamentmanager.admin");
 		}
-		*/
 	}
 
 	@Override
