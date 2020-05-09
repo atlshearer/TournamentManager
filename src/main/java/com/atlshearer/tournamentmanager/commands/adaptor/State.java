@@ -28,7 +28,6 @@ public class State extends Command {
 			return;
 		}
 		
-		adaptor.gameStart();
 		sender.sendMessage(String.format("§aCurrent state of [%s] is '%s'",
 				adaptor.getAdaptorName(), adaptor.getState().toString()));
 	}
