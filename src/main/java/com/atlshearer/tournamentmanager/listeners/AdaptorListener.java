@@ -17,6 +17,6 @@ public class AdaptorListener implements Listener {
 	@EventHandler
 	public void onAdaptorStateChange(AdaptorStateChangeEvent e) {
 		plugin.getLogger().info("Adaptor change state recognised.");
-		plugin.getSignManager().updateSigns();
+		plugin.getSignManager().updateJoinSigns();
 	}
 }

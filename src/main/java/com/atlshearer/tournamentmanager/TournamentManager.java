@@ -87,7 +87,7 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 	
 	public void setNextGame(Adaptor adaptor) {
 		nextGame = adaptor;
-		getSignManager().updateSigns();
+		getSignManager().updateJoinSigns();
 	}
 	
 	public Adaptor getNextGame() {

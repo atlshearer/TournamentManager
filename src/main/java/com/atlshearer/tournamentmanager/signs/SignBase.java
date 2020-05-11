@@ -16,16 +16,34 @@ public abstract class SignBase {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof SignBase) {
-			SignBase other = (SignBase) obj;
-			return other.location == this.location;
+		if (obj == null) {
+			return false;
 		}
-		return false;
+		
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		
+		final SignBase other = (SignBase) obj;
+		
+		if (location.getBlockX() != other.location.getBlockX()) {
+			return false;
+		}
+		
+		if (location.getBlockY() != other.location.getBlockY()) {
+			return false;
+		}
+		
+		if (location.getBlockZ() != other.location.getBlockZ()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override
 	public int hashCode() {
-		return location.hashCode();
+		return location.getBlockX() ^ location.getBlockY() ^ location.getBlockZ();
 	}
 	
 	public abstract void updateSign();

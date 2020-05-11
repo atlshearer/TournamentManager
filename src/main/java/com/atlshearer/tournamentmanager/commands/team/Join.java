@@ -66,6 +66,7 @@ public class Join extends Command {
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully joined '" + team.name + "'.");
 			
+			plugin.getSignManager().updateTeamSign(team.name);
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();

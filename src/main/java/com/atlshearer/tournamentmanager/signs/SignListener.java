@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -34,22 +35,28 @@ public class SignListener implements Listener {
 			
 			String line = e.getLine(1).toLowerCase();
 
+			e.setLine(0, 
+					ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("signs.prefix")));
+			
 			if (line.equalsIgnoreCase("[joinnext]")) {
-				player.sendMessage(ChatColor.GREEN + "'Created' joinnext sign.");
-
-				e.setLine(0, 
-						ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("signs.prefix")));
-
 				plugin.getSignManager().addSign(new SignJoinNext(plugin, e.getBlock().getLocation()));
-				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
-						new Runnable() {
-							@Override
-							public void run() {
-								plugin.getSignManager().updateSigns();
-							}
-						}
-					);
+
+				
+				player.sendMessage(ChatColor.GREEN + "Created joinnext sign.");
+			} else if (line.equalsIgnoreCase("[team]")) {
+				plugin.getSignManager().addSign(new SignTeam(plugin, e.getBlock().getLocation()));
+				
+				player.sendMessage(ChatColor.GREEN + "Created team sign.");
 			}
+			
+			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin,
+					new Runnable() {
+						@Override
+						public void run() {
+							plugin.getSignManager().updateAllSigns();
+						}
+					}
+				);
 		}
 	}
 	
@@ -71,8 +78,37 @@ public class SignListener implements Listener {
 		
 		if (sign.getLine(0).equalsIgnoreCase(prefixline)) {
 			if (sign.getLine(1).equalsIgnoreCase("[joinnext]")) {
-				e.getPlayer().sendMessage(ChatColor.GREEN + "Join next sign click.");
 				plugin.getServer().dispatchCommand(e.getPlayer(), "tournamentmanager joinnext");
+			} else if (sign.getLine(1).equalsIgnoreCase("[team]")) {
+				plugin.getServer().dispatchCommand(e.getPlayer(), "tournamentmanager team " + sign.getLine(2) + " join");
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onSignDestroy(BlockBreakEvent e) {
+		if (!(e.getBlock().getState() instanceof Sign)) {
+			return;
+		}
+		
+		Player player = e.getPlayer();
+		Sign sign = (Sign) e.getBlock().getState();
+		
+		if (sign.getLine(0).equalsIgnoreCase(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("signs.prefix")))) {
+			if (!player.hasPermission("tournamentmanager.admin")) {
+				player.sendMessage(ChatColor.RED + "You do not have required permission.");
+				e.setCancelled(true);
+				return;
+			}
+			
+			String line = sign.getLine(1).toLowerCase();
+			
+			if (line.equalsIgnoreCase("[joinnext]")) {
+				player.sendMessage(ChatColor.RED + "Sign removed");
+				plugin.getSignManager().removeSign(new SignJoinNext(plugin, e.getBlock().getLocation()));
+			} else if (line.equalsIgnoreCase("[team]")) {
+				player.sendMessage(ChatColor.RED + "Sign removed");
+				plugin.getSignManager().removeSign(new SignTeam(plugin, e.getBlock().getLocation()));
 			}
 		}
 	}

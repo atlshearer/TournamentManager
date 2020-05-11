@@ -22,8 +22,13 @@ public class SignManager {
 		return signs.add(sign);
 	}
 	
-	public void updateSigns() {
-		plugin.getLogger().info("Updating signs.");
+	public void updateAllSigns() {
+		updateJoinSigns();
+		updateTeamSigns();
+	}
+	
+	public void updateJoinSigns() {
+		plugin.getLogger().info("Updating join signs.");
 		
 		HashSet<SignBase> invalidSigns = new HashSet<>();
 		
@@ -34,9 +39,61 @@ public class SignManager {
 				continue;
 			}
 			
+			if (!(sign instanceof SignJoinNext)) {
+				continue;
+			}
+			
 			sign.updateSign();
 		}
 		
 		signs.removeAll(invalidSigns);
+	}
+	
+	public void updateTeamSigns() {
+		plugin.getLogger().info("Updating teams signs.");
+		
+		HashSet<SignBase> invalidSigns = new HashSet<>();
+		
+		for (SignBase sign : signs) {
+			if (!(sign.location.getBlock().getState() instanceof Sign)) {
+				plugin.getServer().broadcast(ChatColor.RED + "Sign removed", "tournamentmanager.admin");
+				invalidSigns.add(sign);
+				continue;
+			}
+			
+			if (sign instanceof SignTeam) {
+				sign.updateSign();
+			}			
+		}
+		
+		signs.removeAll(invalidSigns);
+	}
+	
+	public void updateTeamSign(String teamName) {
+		plugin.getLogger().info("Updating team signs.");
+		
+		HashSet<SignBase> invalidSigns = new HashSet<>();
+		
+		for (SignBase sign : signs) {
+			if (!(sign.location.getBlock().getState() instanceof Sign)) {
+				plugin.getServer().broadcast(ChatColor.RED + "Sign removed", "tournamentmanager.admin");
+				invalidSigns.add(sign);
+				continue;
+			}
+			
+			if (sign instanceof SignTeam) {
+				SignTeam teamSign = (SignTeam) sign;
+				
+				if (teamSign.isForTeam(teamName)) {
+					sign.updateSign();					
+				}
+			}		
+		}
+		
+		signs.removeAll(invalidSigns);
+	}
+	
+	public void removeSign(SignBase sign) {
+		signs.remove(sign);
 	}
 }

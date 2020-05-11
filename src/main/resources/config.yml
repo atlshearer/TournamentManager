@@ -22,5 +22,7 @@ signs:
    prefix:  '&lTournament'
    ready:   '&a&lReady!'
    waiting: '&6&lWaiting...'
+   playerCount: '&1&l[%d/%d]'
+   error: '&4&lERROR'
   
 debug: false

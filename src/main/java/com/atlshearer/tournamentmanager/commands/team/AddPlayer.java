@@ -45,6 +45,7 @@ public class AddPlayer extends Command {
 			
 			sender.sendMessage(ChatColor.GREEN + "Successfully added player to team.");
 			
+			plugin.getSignManager().updateTeamSign(team.name);			
 		} catch (SQLException e) {
 			sender.sendMessage(ChatColor.DARK_RED + "An SQL error occured. Please check logs.");
 			e.printStackTrace();
