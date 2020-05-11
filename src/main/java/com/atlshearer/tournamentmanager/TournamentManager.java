@@ -12,7 +12,6 @@ import com.atlshearer.tournamentmanager.api.TournamentManagerAPI;
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.RootCommand;
 import com.atlshearer.tournamentmanager.listeners.LogoutEvent;
-import com.atlshearer.tournamentmanager.listeners.TNTRunListeners;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 import com.atlshearer.tournamentmanager.utils.PlayerUtils;
@@ -44,7 +43,6 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 		
 		// Register Events
 		getServer().getPluginManager().registerEvents(new LogoutEvent(this), this);
-		getServer().getPluginManager().registerEvents(new TNTRunListeners(this), this);
 		
 		// Set tournament to null
 		tournament = null;
@@ -99,11 +97,11 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 	}
 
 	@Override
-	public void addPoints(Adaptor adaptor, Player player, int points) {
-		getLogger().info(() -> String.format("Giving player %s %d points as requested by %s", 
-				player.getName(), points, adaptor.getAdaptorName()));
-		
+	public void addPoints(Adaptor adaptor, Player player, int points) {		
 		if (isTournamentEnabled()) {
+			getLogger().info(() -> String.format("Giving player %s %d points as requested by %s", 
+					player.getName(), points, adaptor.getAdaptorName()));
+			
 			getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
 				@Override
 				public void run() {
@@ -117,7 +115,7 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 				}
 			});
 			
-			getServer().broadcastMessage("Giving player " + player.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " 10 Points");
+			getServer().broadcastMessage("Giving player " + player.getDisplayName() + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " " + points + " Points");
 		} else {
 			getServer().broadcast(ChatColor.RED + "No tournament is enable. No scores being given.", "tournamentmanager.admin");
 		}
