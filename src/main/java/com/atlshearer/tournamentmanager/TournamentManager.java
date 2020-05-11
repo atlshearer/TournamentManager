@@ -12,6 +12,9 @@ import com.atlshearer.tournamentmanager.api.TournamentManagerAPI;
 import com.atlshearer.tournamentmanager.commands.Command;
 import com.atlshearer.tournamentmanager.commands.RootCommand;
 import com.atlshearer.tournamentmanager.listeners.LogoutEvent;
+import com.atlshearer.tournamentmanager.listeners.AdaptorListener;
+import com.atlshearer.tournamentmanager.signs.SignListener;
+import com.atlshearer.tournamentmanager.signs.SignManager;
 import com.atlshearer.tournamentmanager.tournament.Tournament;
 import com.atlshearer.tournamentmanager.utils.DatabaseUtils;
 import com.atlshearer.tournamentmanager.utils.PlayerUtils;
@@ -21,7 +24,9 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 	private Tournament tournament;
 	
 	private HashMap<String, Adaptor> adaptors;
-	private Adaptor nextGame = null;	
+	private Adaptor nextGame = null;
+	
+	private SignManager signManager;
 	
 	@Override
 	public void onEnable() {
@@ -30,6 +35,9 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 		this.saveDefaultConfig();
 		
 		this.getLogger().info(this.getConfig().getString("data.address"));
+		
+		// Enable managers
+		signManager = new SignManager(this);
 		
 		// Enable database
 		DatabaseUtils.onEnable(this);
@@ -43,6 +51,8 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 		
 		// Register Events
 		getServer().getPluginManager().registerEvents(new LogoutEvent(this), this);
+		getServer().getPluginManager().registerEvents(new SignListener(this), this);
+		getServer().getPluginManager().registerEvents(new AdaptorListener(this), this);
 		
 		// Set tournament to null
 		tournament = null;
@@ -77,10 +87,15 @@ public class TournamentManager extends JavaPlugin implements TournamentManagerAP
 	
 	public void setNextGame(Adaptor adaptor) {
 		nextGame = adaptor;
+		getSignManager().updateSigns();
 	}
 	
 	public Adaptor getNextGame() {
 		return nextGame;
+	}
+	
+	public SignManager getSignManager() {
+		return signManager;
 	}
 	
 	// API

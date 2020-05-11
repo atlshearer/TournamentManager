@@ -18,4 +18,9 @@ team:
    # Only applies when players use /tm team <teamname> join
    maxsize: 2
   
+signs:
+   prefix:  '&lTournament'
+   ready:   '&a&lReady!'
+   waiting: '&6&lWaiting...'
+  
 debug: false
